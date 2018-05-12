@@ -58,14 +58,14 @@ class SIMULATIONTB: public Testbench<VStage_IF> {
         {SEL_ADDR_PC4, STALL_OFF, 0x00000000, 0, 0xABCDEF04}}; // PC = PC + 4  = 0xABCDEF04 |  NO   |    NO
       
       for (int num_test = 0; num_test < TOTAL_TESTS; num_test++) {
-        m_core->branch_addr = data[num_test][BRANCH_ADDR];
-        m_core->sel_addr    = data[num_test][SEL_ADDR];
-        m_core->stall       = data[num_test][STALL] ;
+        m_core->branch_addr_i = data[num_test][BRANCH_ADDR];
+        m_core->sel_addr_i    = data[num_test][SEL_ADDR];
+        m_core->stall_i       = data[num_test][STALL] ;
 
         Tick();
 
-        if((m_core->mis_addr_exc != data[num_test][MIS_ADDR_EXC]) ||
-           (m_core->out != data[num_test][OUTPUT]))
+        if((m_core->mis_addr_exc_o != data[num_test][MIS_ADDR_EXC]) ||
+           (m_core->pc_o != data[num_test][OUTPUT]))
           return num_test;
       }
     }

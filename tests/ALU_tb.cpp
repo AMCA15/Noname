@@ -66,13 +66,13 @@ class SIMULATIONTB: public Testbench<VALU> {
 
 
       for (int num_test = 0; num_test < TOTAL_TESTS; num_test++) {
-        m_core->in0 = data[num_test][IN0];
-        m_core->in1 = data[num_test][IN1];
-        m_core->op  = data[num_test][OP] ;
+        m_core->in0_i = data[num_test][IN0];
+        m_core->in1_i = data[num_test][IN1];
+        m_core->op_i  = data[num_test][OP] ;
 
         Tick();
 
-        if(m_core->out != data[num_test][OUT])
+        if(m_core->out_o != data[num_test][OUT])
           return num_test;
       }
     }

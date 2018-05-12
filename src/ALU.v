@@ -10,7 +10,7 @@
 
 //Currently the clk_i and rst_i are only for simulation purposes
 
-module ALU(clk_i, rst_i, in0, in1, op, out);
+module alu(clk_i, rst_i, in0_i, in1_i, op_i, out_o);
   localparam ALU_ADD  = 4'b0000;
   localparam ALU_SUB  = 4'b1000;
   localparam ALU_AND  = 4'b0111;
@@ -25,26 +25,26 @@ module ALU(clk_i, rst_i, in0, in1, op, out);
   input clk_i;
   input rst_i;
 
-  input [31:0] in0;
-  input [31:0] in1;
-  input [3:0] op;
-  output [31:0] out;
+  input [31:0] in0_i;
+  input [31:0] in1_i;
+  input [3:0] op_i;
+  output [31:0] out_o;
 
-  wire signed [31:0] A = in0;
-  wire signed [31:0] B = in1;
+  wire signed [31:0] A = in0_i;
+  wire signed [31:0] B = in1_i;
 
   always @(*) begin
-    case(op)
-      ALU_ADD: out = A + B;
-      ALU_SUB: out = A - B;
-      ALU_AND: out = A & B;
-      ALU_OR: out = A | B;
-      ALU_XOR: out = A ^ B;
-      ALU_SRL: out = A >> B;
-      ALU_SLL: out = A << B;
-      ALU_SRA: out = A >>> B;
-      ALU_SLT: out = (A < B) ? 1 : 0;
-      ALU_SLTU: out = (0 != A) ? 1 : 0;
+    case(op_i)
+      ALU_ADD: out_o = A + B;
+      ALU_SUB: out_o = A - B;
+      ALU_AND: out_o = A & B;
+      ALU_OR: out_o = A | B;
+      ALU_XOR: out_o = A ^ B;
+      ALU_SRL: out_o = A >> B;
+      ALU_SLL: out_o = A << B;
+      ALU_SRA: out_o = A >>> B;
+      ALU_SLT: out_o = (A < B) ? 1 : 0;
+      ALU_SLTU: out_o = (0 != A) ? 1 : 0;
     endcase
   end
 endmodule
