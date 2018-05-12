@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "VALU.h"
+#include "Valu.h"
 #include "testbench.h"
 
 
@@ -36,7 +36,7 @@
 
 using namespace std;
 
-class SIMULATIONTB: public Testbench<VALU> {
+class SIMULATIONTB: public Testbench<Valu> {
   public:
     // -----------------------------------------------------------------------------
     // Testbench constructor
@@ -84,7 +84,7 @@ int main(int argc, char **argv, char **env) {
   double frequency = 1e6;
   std::unique_ptr<SIMULATIONTB> tb(new SIMULATIONTB(frequency));
 
-  tb->OpenTrace("ALU.vcd");
+  tb->OpenTrace("alu.vcd");
 
   int ret = tb->Simulate(100e3);
 

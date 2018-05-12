@@ -7,7 +7,7 @@
 # Directories
 #--------------------------------------------------------------------
 OBJ_DIR = sim_obj
-SRC_DIR = src
+SRC_DIR = rtl
 TESTS_DIR = tests
 BUILD_DIR = build
 

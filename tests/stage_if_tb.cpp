@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#include "VStage_IF.h"
+#include "Vstage_if.h"
 #include "testbench.h"
 
 
@@ -29,7 +29,7 @@
 
 using namespace std;
 
-class SIMULATIONTB: public Testbench<VStage_IF> {
+class SIMULATIONTB: public Testbench<Vstage_if> {
   public:
     // -----------------------------------------------------------------------------
     // Testbench constructor
@@ -76,7 +76,7 @@ int main(int argc, char **argv, char **env) {
   double frequency = 1e6;
   std::unique_ptr<SIMULATIONTB> tb(new SIMULATIONTB(frequency));
 
-  tb->OpenTrace("Stage_IF.vcd");
+  tb->OpenTrace("stage_if.vcd");
 
   int ret = tb->Simulate(100e3);
 
