@@ -40,7 +40,7 @@ class SIMULATIONTB: public Testbench<Valu> {
   public:
     // -----------------------------------------------------------------------------
     // Testbench constructor
-    SIMULATIONTB(double frequency, double timescale=1e-9): Testbench(frequency, timescale) {}
+    SIMULATIONTB(double frequency=1e6, double timescale=1e-9): Testbench(frequency, timescale) {}
 
     int Simulate(unsigned long max_time=1000000){
       Reset();
@@ -80,22 +80,20 @@ class SIMULATIONTB: public Testbench<Valu> {
 
 
 int main(int argc, char **argv, char **env) {
-
-  double frequency = 1e6;
-  std::unique_ptr<SIMULATIONTB> tb(new SIMULATIONTB(frequency));
+  std::unique_ptr<SIMULATIONTB> tb(new SIMULATIONTB());
 
   tb->OpenTrace("alu.vcd");
 
-  int ret = tb->Simulate(100e3);
+  int ret = tb->Simulate();
 
   printf("\nALU Testbench:\n");
 
   if(ret == TOTAL_TESTS)
-    printf(OK_COLOR "[OK]" NO_COLOR " Test Passed! Complete: %d/%d", ret, TOTAL_TESTS);
+    printf(OK_COLOR "[OK]" NO_COLOR " Test Passed! ");
   else
-    printf(ERROR_COLOR "[FAILED]" NO_COLOR " Test Failed! Complete: %d/%d", ret, TOTAL_TESTS);
+    printf(ERROR_COLOR "[FAILED]" NO_COLOR " Test Failed! ");
 
-  printf("\n");
+  printf("Complete: %d/%d\n", ret, TOTAL_TESTS);
 
   exit(0);
 }
