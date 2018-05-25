@@ -8,7 +8,8 @@
 */
 
 
-module branch_unit (clk_i, branch_op_i, rst_i, equ_i, lt_i, ltu_i, is_branch_taken_o);
+module branch_unit(clk_i, branch_op_i, rst_i, equ_i, lt_i, ltu_i, is_branch_taken_o);
+
 	input clk_i;   
 	input rst_i;  
 
