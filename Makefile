@@ -20,12 +20,18 @@ objs_no_test  = $(patsubst %_tb.cpp, %, $(notdir $(filter-out $(objs_basename), 
 objs_verilate = $(addsuffix .verilate, $(objs_basename))
 objs_compile  = $(addprefix V, $(addsuffix .compile, $(objs_no_test)))
 objs_run  	  = $(addprefix V, $(addsuffix .run, $(objs_no_test)))
+objs_extra	  = $(wildcard $(EXTRA_DIR)/*.cpp)
+
 
 #--------------------------------------------------------------------
 # Build Rules
 #--------------------------------------------------------------------
 VERILATOR_CFLAGS = -CFLAGS "-std=c++11 -O3 -I../$(EXTRA_DIR)"
 VERILATOR_OPTS = -Wall --Mdir $(OBJ_DIR) -y $(SRC_DIR) -Wno-lint --trace --exe 
+
+INCS = -I /mingw$(shell getconf LONG_BIT)/include/libelf -I../$(EXTRA_DIR)
+VERILATOR_CFLAGS = -CFLAGS "-std=c++11 -O3 $(INCS)" -LDFLAGS "-lelf"
+VERILATOR_OPTS = -Wall --Mdir $(OBJ_DIR) -y $(SRC_DIR) -Wno-lint --trace --exe
 
 #--------------------------------------------------------------------
 # Default
@@ -47,7 +53,7 @@ run: compile $(objs_run)
 
 $(objs_verilate): %.verilate: $(SRC_DIR)/%.v
 	@printf "%b" "$(.COM_COLOR)$(.VER_STRING)$(.OBJ_COLOR) $<$(.NO_COLOR)\n"
-	@verilator $(VERILATOR_CFLAGS) $(VERILATOR_OPTS) --cc $< --top-module $(basename $(notdir $<)) $(patsubst %.verilate, $(TESTS_DIR)/%_tb.cpp, $@)
+	@verilator $(VERILATOR_CFLAGS) $(VERILATOR_OPTS) --cc $< --top-module $(basename $(notdir $<)) $(patsubst %.verilate, $(TESTS_DIR)/%_tb.cpp, $@) $(objs_extra)
 
 
 $(objs_compile): %.compile: $(OBJ_DIR)/%.mk
