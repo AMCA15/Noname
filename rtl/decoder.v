@@ -7,8 +7,8 @@
 
 module decoder(clk_i, rst_i, instruction_i,
                funct3_o, rs1_o, rs2_o, rd_o, imm_op_o, sel_dat_a_o, sel_dat_b_o,
-               is_alu_alt_op_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
-               is_mem_o, we_mem_o, is_misc_mem_o, is_system_o);
+               alu_op_o, csr_addr_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
+               is_mem_o, we_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);
 
   input clk_i;
   input rst_i;
@@ -40,6 +40,18 @@ module decoder(clk_i, rst_i, instruction_i,
   localparam SEL_PC   = 2'b10;
   localparam SEL_ZERO = 2'b11;
 
+  // ALU operations
+  localparam ALU_ADD  = 4'b0000;
+  localparam ALU_SUB  = 4'b1000;
+  localparam ALU_AND  = 4'b0111;
+  localparam ALU_OR   = 4'b0110;
+  localparam ALU_XOR  = 4'b0100;
+  localparam ALU_SRL  = 4'b0101;
+  localparam ALU_SLL  = 4'b0001;
+  localparam ALU_SRA  = 4'b1101;
+  localparam ALU_SLT  = 4'b0010;
+  localparam ALU_SLTU = 4'b0011;
+
 
   input  [31:0] instruction_i;
   output [2:0] funct3_o;
@@ -49,6 +61,8 @@ module decoder(clk_i, rst_i, instruction_i,
   output [4:0] rd_o;
   output [2:0] sel_dat_a_o;
   output [2:0] sel_dat_b_o;
+  output [3:0] alu_op_o;
+  output [11:0] csr_addr_o;
 
   output is_lui_o;
   output is_auipc_o;
@@ -59,7 +73,7 @@ module decoder(clk_i, rst_i, instruction_i,
   output we_mem_o;
   output is_misc_mem_o;
   output is_system_o;
-  output is_alu_alt_op_o;
+  output e_illegal_inst_o;
 
   wire [6:0] opcode;
 
@@ -67,81 +81,90 @@ module decoder(clk_i, rst_i, instruction_i,
   assign funct3_o        = instruction_i[14:12];
   assign rs1_o           = instruction_i[19:15];
   assign rs2_o           = instruction_i[24:20];
-  assign rd              = instruction_i[11:7];
-  assign is_alu_alt_op_o = instruction_i[30];  
+  assign rd_o            = instruction_i[11:7];
+  assign csr_addr_o      = instruction_i[31:20];
 
 
   always @(instruction_i) begin
-    is_lui_o      = 0;
-    is_auipc_o    = 0;
-    is_jal_o      = 0;
-    is_jalr_o     = 0;
-    is_branch_o   = 0;
-    is_mem_o      = 0;
-    we_mem_o      = 0;
-    is_misc_mem_o = 0;
-    is_system_o   = 0;
+    is_lui_o         = 0;
+    is_auipc_o       = 0;
+    is_jal_o         = 0;
+    is_jalr_o        = 0;
+    is_branch_o      = 0;
+    is_mem_o         = 0;
+    we_mem_o         = 0;
+    is_misc_mem_o    = 0;
+    is_system_o      = 0;
+    e_illegal_inst_o = 0;
 
     case(opcode)
       LUI: begin
-        sel_dat_a_o = SEL_PC;
-        sel_dat_b_o = SEL_IMM;
+        sel_dat_a_o = SEL_IMM;
+        sel_dat_b_o = SEL_ZERO;
         imm_op_o    = IMM_U;
+        alu_op_o    = ALU_ADD;
         is_lui_o    = 1;
       end
 
       AUIPC: begin
         sel_dat_a_o = SEL_PC;
-        sel_dat_b_o = SEL_IMM;    
-        imm_op_o    = IMM_U;    
+        sel_dat_b_o = SEL_IMM;
+        imm_op_o    = IMM_U;
+        alu_op_o    = ALU_ADD;
         is_auipc_o  = 1;
       end
 
       JAL: begin
-        sel_dat_a_o = SEL_REG;
-        sel_dat_b_o = SEL_ZERO;         
-        imm_op_o    = IMM_J;       
+        sel_dat_a_o = SEL_PC;
+        sel_dat_b_o = SEL_IMM;
+        imm_op_o    = IMM_J;
+        alu_op_o    = ALU_ADD;
         is_jal_o    = 1;
       end
 
       JALR: begin
         sel_dat_a_o = SEL_REG;
-        sel_dat_b_o = SEL_IMM;            
-        imm_op_o    = IMM_I;    
+        sel_dat_b_o = SEL_IMM;
+        imm_op_o    = IMM_I;
+        alu_op_o    = ALU_ADD;
         is_jalr_o   = 1;
       end
 
       BRANCH: begin
         sel_dat_a_o = SEL_REG;
-        sel_dat_b_o = SEL_REG;           
-        imm_op_o    = IMM_B;     
+        sel_dat_b_o = SEL_REG;
+        imm_op_o    = IMM_B;
         is_branch_o = 1;
       end
 
       LOAD: begin
         sel_dat_a_o = SEL_REG;
-        sel_dat_b_o = SEL_IMM;                
+        sel_dat_b_o = SEL_IMM;
         imm_op_o    = IMM_I;
+        alu_op_o    = ALU_ADD;
         is_mem_o    = 1;
       end
 
       STORE: begin
         sel_dat_a_o = SEL_REG;
-        sel_dat_b_o = SEL_IMM;                     
-        imm_op_o    = IMM_S;   
+        sel_dat_b_o = SEL_IMM;
+        imm_op_o    = IMM_S;
+        alu_op_o    = ALU_ADD;
         is_mem_o    = 1;
         we_mem_o    = 1;
       end
 
       OP_IMM: begin
         sel_dat_a_o = SEL_REG;
-        sel_dat_b_o = SEL_IMM;           
-        imm_op_o    = IMM_I;     
+        sel_dat_b_o = SEL_IMM;
+        alu_op_o    = {instruction_i[30], funct3_o};
+        imm_op_o    = IMM_I;
       end
 
       OP: begin
         sel_dat_a_o = SEL_REG;
-        sel_dat_b_o = SEL_REG;        
+        sel_dat_b_o = SEL_REG;
+        alu_op_o = {instruction_i[30], funct3_o};
       end
 
       MISC_MEM: begin
@@ -149,14 +172,18 @@ module decoder(clk_i, rst_i, instruction_i,
       end
 
       SYSTEM: begin
-        is_system_o = 1;
         // Check if is CSR with immediate instruction
         if (funct3_o[2])
           sel_dat_a_o = SEL_IMM;
         else
           sel_dat_a_o = SEL_REG;
+          
+        is_system_o = 1;
+      end
+
+      default: begin
+        e_illegal_inst_o = 1;
       end
     endcase
-    
   end
 endmodule
