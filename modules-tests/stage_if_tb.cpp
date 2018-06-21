@@ -106,7 +106,7 @@ int main(int argc, char **argv, char **env) {
 
   tb->OpenTrace("stage_if.vcd");
 
-  const std::string &progfile = "tests_extra/rv32ui-p-add.elf";
+  const std::string &progfile = "debug-tests-extra/rv32ui-p-add.elf";
 
   int ret = tb->Simulate(progfile);
 

@@ -1,72 +1,73 @@
-#=======================================================================
-# Makefile for Noname Project
-# Anderson Contreras
-#-----------------------------------------------------------------------
-include pprint.mk
+# ------------------------------------------------------------------------------
+# Copyright (c) 2018 Angel Terrones <angelterrones@gmail.com>
+# ------------------------------------------------------------------------------
+include tests/verilator/pprint.mk
+SHELL=bash
 
-#--------------------------------------------------------------------
-# Directories
-#--------------------------------------------------------------------
-OBJ_DIR   = sim_obj
-SRC_DIR   = rtl
-TESTS_DIR = tests
-EXTRA_DIR = tests_extra
+# ------------------------------------------------------------------------------
+.PROJECTNAME = DERP_FIX_ME
+# ------------------------------------------------------------------------------
+.SUBMAKE		= $(MAKE) --no-print-directory
+.PWD			= $(shell pwd)
+.BFOLDER		= build
+.RVTESTSF		= tests/riscv-tests
+.RVBENCHMARKSF	= tests/benchmarks
+.RVXTRASF       = tests/extra-tests
+.MKTB			= tests/verilator/build.mk
+.TBEXE			= $(.BFOLDER)/$(.PROJECTNAME).exe --timeout 50000000 --file
 
-#--------------------------------------------------------------------
-# Sources
-#--------------------------------------------------------------------
-objs_basename = $(basename $(notdir $(wildcard $(SRC_DIR)/*.v)))
-objs_no_test  = $(patsubst %_tb.cpp, %, $(notdir $(filter-out $(objs_basename), $(wildcard $(TESTS_DIR)/*_tb.cpp))))
-objs_verilate = $(addsuffix .verilate, $(objs_basename))
-objs_compile  = $(addprefix V, $(addsuffix .compile, $(objs_no_test)))
-objs_run  	  = $(addprefix V, $(addsuffix .run, $(objs_no_test)))
-objs_extra	  = $(wildcard $(EXTRA_DIR)/*.cpp)
+# ------------------------------------------------------------------------------
+# targets
+# ------------------------------------------------------------------------------
+help:
+	@echo -e "--------------------------------------------------------------------------------"
+	@echo -e "Please, choose one target:"
+	@echo -e "- compile-tests:  Compile RISC-V assembler tests, benchmarks and extra tests."
+	@echo -e "- verilate:       Generate C++ core model."
+	@echo -e "- build-model:    Build C++ core model."
+	@echo -e "- run-tests:      Execute assembler tests, benchmarks and extra tests."
+	@echo -e "--------------------------------------------------------------------------------"
 
+compile-tests:
+	+@$(.SUBMAKE) -C $(.RVTESTSF)
+	+@$(.SUBMAKE) -C $(.RVBENCHMARKSF)
+	+@$(.SUBMAKE) -C $(.RVXTRASF)
 
-#--------------------------------------------------------------------
-# Build Rules
-#--------------------------------------------------------------------
-VERILATOR_CFLAGS = -CFLAGS "-std=c++11 -O3 -I../$(EXTRA_DIR)"
-VERILATOR_OPTS = -Wall --Mdir $(OBJ_DIR) -y $(SRC_DIR) -Wno-lint --trace --exe 
+# ------------------------------------------------------------------------------
+# verilate and build
+verilate:
+	@printf "%b" "$(.MSJ_COLOR)Building RTL (Modules) for Verilator$(.NO_COLOR)\n"
+	@mkdir -p $(.BFOLDER)
+	+@$(.SUBMAKE) -f $(.MKTB) build-vlib BUILD_DIR=$(.BFOLDER)
 
-INCS = -I /mingw$(shell getconf LONG_BIT)/include/libelf -I../$(EXTRA_DIR)
-VERILATOR_CFLAGS = -CFLAGS "-std=c++11 -O3 $(INCS)" -LDFLAGS "-lelf"
-VERILATOR_OPTS = -Wall --Mdir $(OBJ_DIR) -y $(SRC_DIR) -Wno-lint --trace --exe
+build-model: verilate
+	+@$(.SUBMAKE) -f $(.MKTB) build-core BUILD_DIR=$(.BFOLDER) EXE=$(.PROJECTNAME)
 
-#--------------------------------------------------------------------
-# Default
-#--------------------------------------------------------------------
-default: run
+# ------------------------------------------------------------------------------
+# verilator tests
+run-tests: compile-tests build-model
+	$(eval .RVTESTS:=$(shell find $(.RVTESTSF) -name "rv32ui*.elf" -o -name "rv32um*.elf" -o -name "rv32mi*.elf" ! -name "*breakpoint*.elf"))
+	$(eval .RVBENCHMARKS:=$(shell find $(.RVBENCHMARKSF) -name "*.riscv"))
+	$(eval .RVXTRAS:=$(shell find $(.RVXTRASF) -name "*.riscv"))
 
-#--------------------------------------------------------------------
-# Build, compile and run Testbenchs
-#--------------------------------------------------------------------
-verilate: $(objs_verilate)
-	@printf "%b" "$(.NO_COLOR)$(.VER_STRING) $(.OK_COLOR)$(.OK_STRING)$(.NO_COLOR)\n\n"
-
-compile: verilate $(objs_compile)
-	@printf "%b" "$(.NO_COLOR)Compilation $(.OK_COLOR)$(.OK_STRING)$(.NO_COLOR)\n\n"
-
-run: compile $(objs_run)
-
-#--------------------------------------------------------------------
-
-$(objs_verilate): %.verilate: $(SRC_DIR)/%.v
-	@printf "%b" "$(.COM_COLOR)$(.VER_STRING)$(.OBJ_COLOR) $<$(.NO_COLOR)\n"
-	@verilator $(VERILATOR_CFLAGS) $(VERILATOR_OPTS) --cc $< --top-module $(basename $(notdir $<)) $(patsubst %.verilate, $(TESTS_DIR)/%_tb.cpp, $@) $(objs_extra)
-
-
-$(objs_compile): %.compile: $(OBJ_DIR)/%.mk
-	@printf "%b" "$(.COM_COLOR)$(.COM_STRING)$(.OBJ_COLOR) $< $(.NO_COLOR)\n"
-	@make --quiet -C $(OBJ_DIR) -j -f $(patsubst %.compile, %.mk, $@) $(patsubst %.compile, %, $@)
-	
-
-$(objs_run): %.run: $(OBJ_DIR)/%.exe
-	@printf "%b" "\n$(.COM_COLOR)Running$(.OBJ_COLOR)"
-	@$< | head
-
-#--------------------------------------------------------------------
-# Clean
-#--------------------------------------------------------------------
+	@for file in $(.RVTESTS) $(.RVBENCHMARKS) $(.RVXTRAS); do						\
+		$(.TBEXE) $$file --mem-delay $$delay > /dev/null;								\
+		if [ $$? -eq 0 ]; then															\
+			printf "%-50b %b\n" $$file "$(.OK_COLOR)$(.OK_STRING)$(.NO_COLOR)";			\
+		else																			\
+			printf "%-50s %b" $$file "$(.ERROR_COLOR)$(.ERROR_STRING)$(.NO_COLOR)\n";	\
+		fi;																				\
+	done
+# ------------------------------------------------------------------------------
+# clean
+# ------------------------------------------------------------------------------
 clean:
-	@rm -rf $(OBJ_DIR) *.vcd
+	@rm -rf $(.BFOLDER)
+
+distclean: clean
+	@find . | grep -E "(__pycache__|\.pyc|\.pyo|\.cache)" | xargs rm -rf
+	@$(.SUBMAKE) -C $(.RVTESTSF) clean
+	@$(.SUBMAKE) -C $(.RVBENCHMARKSF) clean
+	@$(.SUBMAKE) -C $(.RVXTRASF) clean
+
+.PHONY: verilate compile-tests build-model run-tests clean distclean
