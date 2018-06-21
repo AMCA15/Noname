@@ -33,6 +33,7 @@ module decoder(clk_i, rst_i, instruction_i,
   localparam IMM_U = 3'b011;
   localparam IMM_J = 3'b100;
   localparam IMM_C = 3'b101;
+  localparam IMM_SH = 0'b110; //Shamt for shift
 
   // Mux control for ALU's inputs
   localparam SEL_REG  = 2'b00;
@@ -97,6 +98,12 @@ module decoder(clk_i, rst_i, instruction_i,
     is_system_o      = 0;
     e_illegal_inst_o = 0;
 
+    //Initializations for simulation purposes
+    alu_op_o         = 0;
+    imm_op_o         = 0;
+    sel_dat_a_o      = 0;
+    sel_dat_b_o      = 0;
+
     case(opcode)
       LUI: begin
         sel_dat_a_o = SEL_IMM;
@@ -155,17 +162,26 @@ module decoder(clk_i, rst_i, instruction_i,
       end
 
       OP_IMM: begin
+        imm_op_o    = IMM_SH;
         sel_dat_a_o = SEL_REG;
         sel_dat_b_o = SEL_IMM;
-        alu_op_o    = {instruction_i[30], funct3_o};
-        imm_op_o    = IMM_I;
+        case (funct3_o)
+          3'b001: alu_op_o = {instruction_i[30], funct3_o};
+          3'b101: alu_op_o = {instruction_i[30], funct3_o};
+          default : begin 
+            alu_op_o = {1'b0, funct3_o};
+            imm_op_o    = IMM_I;
+          end
+        endcase
       end
 
       OP: begin
         sel_dat_a_o = SEL_REG;
         sel_dat_b_o = SEL_REG;
-        alu_op_o = {instruction_i[30], funct3_o};
+        alu_op_o    = {instruction_i[30], funct3_o};
       end
+
+
 
       MISC_MEM: begin
         is_misc_mem_o = 1;
@@ -177,7 +193,7 @@ module decoder(clk_i, rst_i, instruction_i,
           sel_dat_a_o = SEL_IMM;
         else
           sel_dat_a_o = SEL_REG;
-          
+        imm_op_o = IMM_C;
         is_system_o = 1;
       end
 
