@@ -53,7 +53,7 @@ module top #(
     wire                iwbm_ack;
     wire                dwbm_ack;
 
-    FIX_MEEEEEEE #(/*AUTOINSTPARAM*/
+    core #(/*AUTOINSTPARAM*/
                   // Parameters
                   .HART_ID              (HART_ID[31:0]),
                   .RESET_ADDR           (RESET_ADDR[31:0]),

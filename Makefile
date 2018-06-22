@@ -5,7 +5,7 @@ include tests/verilator/pprint.mk
 SHELL=bash
 
 # ------------------------------------------------------------------------------
-.PROJECTNAME = DERP_FIX_ME
+.PROJECTNAME = Noname
 # ------------------------------------------------------------------------------
 .SUBMAKE		= $(MAKE) --no-print-directory
 .PWD			= $(shell pwd)
