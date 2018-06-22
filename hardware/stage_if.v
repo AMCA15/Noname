@@ -61,7 +61,7 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i
   // PC's
   always @(posedge clk_i) begin
     if (rst_i) begin
-      pc_o = 32'hFFFFFFFC;
+      pc_o = 32'h7FFFFFFC;
     end
     else if (!stall_i && !wbm_cyc_o) begin
 

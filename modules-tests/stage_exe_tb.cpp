@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "Vstage_exe.h"
-#include "testbench.h"
+#include "testbench_modules.h"
 
 
 #define OK_COLOR    "\033[0;32m"

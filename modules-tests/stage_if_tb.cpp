@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "Vstage_if.h"
-#include "testbench.h"
+#include "testbench_modules.h"
 #include "wbmemory.h"
 #include "colors.h"
 
@@ -28,7 +28,7 @@
 #define wbm_re_i   m_core->wbm_re_i
 
 // Define parameters for RAM
-#define MEMSTART 0x00000000u    // Initial address
+#define MEMSTART 0x80000000u    // Initial address
 #define MEMSZ    0x00080000u    // size: 512 KB
 
 
@@ -106,7 +106,7 @@ int main(int argc, char **argv, char **env) {
 
   tb->OpenTrace("stage_if.vcd");
 
-  const std::string &progfile = "debug-tests-extra/rv32ui-p-add.elf";
+  const std::string &progfile = "tests/riscv-tests/rv32ui-p-add.elf";
 
   int ret = tb->Simulate(progfile);
 

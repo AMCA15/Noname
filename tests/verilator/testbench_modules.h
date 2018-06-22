@@ -16,7 +16,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-// File: testbench.h
+// File: testbench_modules.h
 // Common interface for Verilator testbenches.
 
 #ifndef TESTBENCH_H
