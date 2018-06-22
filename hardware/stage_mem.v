@@ -4,7 +4,7 @@
 */
 
 module stage_mem(clk_i, rst_i, is_mem_i, we_mem_i, funct3_i, mem_data_i, mem_addr_i, mem_data_o,
-                 wbm_dat_i, wbm_ack_i, wbm_err_i, wbm_re_i, wbm_cyc_o, wbm_stb_o, wbm_dat_o,
+                 wbm_dat_i, wbm_ack_i, wbm_err_i, wbm_cyc_o, wbm_stb_o, wbm_dat_o,
                  wbm_addr_o, wbm_we_o, wbm_sel_o, e_ld_addr_mis_o, e_st_addr_mis_o);
 
     input clk_i;
@@ -22,7 +22,6 @@ module stage_mem(clk_i, rst_i, is_mem_i, we_mem_i, funct3_i, mem_data_i, mem_add
     // Wishbone interface
     input wbm_ack_i;
     input wbm_err_i;
-    input wbm_re_i;
     input [31:0] wbm_dat_i;
     output wbm_cyc_o;
     output wbm_stb_o;

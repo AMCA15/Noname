@@ -7,7 +7,7 @@
 
 module decoder(clk_i, rst_i, instruction_i,
                funct3_o, rs1_o, rs2_o, rd_o, imm_op_o, sel_dat_a_o, sel_dat_b_o,
-               alu_op_o, csr_addr_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
+               alu_op_o, csr_addr_o, is_op_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
                is_mem_o, we_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);
 
   input clk_i;
@@ -65,6 +65,7 @@ module decoder(clk_i, rst_i, instruction_i,
   output [3:0] alu_op_o;
   output [11:0] csr_addr_o;
 
+  output is_op_o;
   output is_lui_o;
   output is_auipc_o;
   output is_jal_o;
@@ -87,6 +88,7 @@ module decoder(clk_i, rst_i, instruction_i,
 
 
   always @(instruction_i) begin
+    is_op_o          = 0;
     is_lui_o         = 0;
     is_auipc_o       = 0;
     is_jal_o         = 0;
@@ -162,6 +164,7 @@ module decoder(clk_i, rst_i, instruction_i,
       end
 
       OP_IMM: begin
+        is_op_o     = 1;
         imm_op_o    = IMM_SH;
         sel_dat_a_o = SEL_REG;
         sel_dat_b_o = SEL_IMM;
@@ -176,6 +179,7 @@ module decoder(clk_i, rst_i, instruction_i,
       end
 
       OP: begin
+        is_op_o     = 1;
         sel_dat_a_o = SEL_REG;
         sel_dat_b_o = SEL_REG;
         alu_op_o    = {instruction_i[30], funct3_o};
