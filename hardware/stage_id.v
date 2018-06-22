@@ -3,10 +3,6 @@
 * Anderson Contreras
 */
 
-`include "decoder.v"
-`include "reg_file.v"
-`include "imm_gen.v"
-
 module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, is_fwd_b_i, dat_fwd_a_i, dat_fwd_b_i,
                 funct3_o, rd_o, alu_op_o, csr_addr_o, dat_a_o, dat_b_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
                 is_mem_o, we_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);

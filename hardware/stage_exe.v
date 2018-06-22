@@ -3,9 +3,6 @@
 * Anderson Contreras
 */
 
-`include "alu.v"
-`include "branch_unit.v"
-
 module stage_exe(clk_i, rst_i, pc_i, imm_i, dat_a_i, dat_b_i, alu_op_i, funct3_i,
 				 is_jal_inst_i, is_jalr_inst_i, is_br_inst_i,
 				 is_br_j_taken_o, e_inst_addr_mis_o, br_j_addr_o, alu_out_o);

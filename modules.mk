@@ -53,7 +53,7 @@ run: compile $(objs_run)
 
 $(objs_verilate): %.verilate: $(SRC_DIR)/%.v
 	@printf "%b" "$(.COM_COLOR)$(.VER_STRING)$(.OBJ_COLOR) $<$(.NO_COLOR)\n"
-	@verilator $(VERILATOR_CFLAGS) $(VERILATOR_OPTS) --cc $< --top-module $(basename $(notdir $<)) $(patsubst %.verilate, $(M_TESTS_DIR)/%_tb.cpp, $@) $(objs_extra)
+	@verilator $(VERILATOR_CFLAGS) $(VERILATOR_OPTS) --cc $< $(patsubst %.verilate, $(M_TESTS_DIR)/%_tb.cpp, $@) $(objs_extra)
 
 
 $(objs_compile): %.compile: $(OBJ_DIR)/%.mk

@@ -3,8 +3,6 @@
 * Anderson Contreras
 */
 
-`include "wbu.v"
-
 module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i,
                 instruction_o, pc_o, wbm_dat_i, wbm_ack_i, wbm_err_i,
                 wbm_cyc_o, wbm_stb_o, wbm_dat_o, wbm_addr_o, wbm_we_o, wbm_sel_o);
