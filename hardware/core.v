@@ -11,11 +11,11 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 			 dwbm_ack_i, dwbm_err_i, dwbm_dat_i, dwbm_we_o, dwbm_cyc_o, dwbm_stb_o, dwbm_sel_o, dwbm_addr_o, dwbm_dat_o,
 			 xint_meip_i, xint_mtip_i, xint_msip_i);
 
-	parameter HART_ID;
-	parameter RESET_ADDR;
-	parameter ENABLE_COUNTERS;
-	parameter ENABLE_M_ISA;
-	parameter UCONTROL;
+	parameter [31:0] HART_ID          = 0;
+	parameter [31:0] RESET_ADDR       = 32'h8000_0000;
+	parameter [0:0]  ENABLE_COUNTERS  = 1;
+	parameter [0:0]  ENABLE_M_ISA     = 1;
+	parameter 		 UCONTROL         = "ucontrol.list";
 
 	input clk_i;
     input rst_i;
