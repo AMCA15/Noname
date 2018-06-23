@@ -4,7 +4,7 @@
 */
 
 module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, is_fwd_b_i, dat_fwd_a_i, dat_fwd_b_i,
-                funct3_o, rd_o, alu_op_o, csr_addr_o, dat_a_o, dat_b_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
+                funct3_o, rs1_o, rs2_o, rd_o, alu_op_o, csr_addr_o, dat_a_o, dat_b_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
                 is_mem_o, we_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);
     
     // Mux control for ALU's inputs
@@ -26,6 +26,8 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
     input [31:0] dat_fwd_a_i;
     input [31:0] dat_fwd_b_i;
     output [2:0]  funct3_o;
+    output [4:0]  rs1_o;
+    output [4:0]  rs2_o;
     output [4:0]  rd_o;
     output [3:0]  alu_op_o;
     output [11:0] csr_addr_o;
@@ -46,7 +48,6 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
     wire [2:0] imm_op;
     wire [2:0] sel_dat_a;
     wire [2:0] sel_dat_b;
-    wire [4:0] rs1, rs2;
     wire [31:0] rs1_d, rs2_d;
 
     wire [31:0] imm_out;
@@ -55,9 +56,9 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
                        .rst_i(rst_i),
                        .instruction_i(instruction_i),
                        .funct3_o(funct3),
-                       .rs1_o(rs1),
-                       .rs2_o(rs2),
-                       .rd_o(rd),
+                       .rs1_o(rs1_d),
+                       .rs2_o(rs2_d),
+                       .rd_o(rd_o),
                        .imm_op_o(imm_op),
                        .sel_dat_a_o(sel_dat_a),
                        .sel_dat_b_o(sel_dat_b),

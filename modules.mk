@@ -15,7 +15,7 @@ M_EXTRA_DIR = tests/verilator
 #--------------------------------------------------------------------
 # Sources
 #--------------------------------------------------------------------
-objs_basename = $(basename $(notdir $(wildcard $(SRC_DIR)/*.v)))
+objs_basename = $(filter-out defines, $(basename $(notdir $(wildcard $(SRC_DIR)/*.v))))
 objs_no_test  = $(patsubst %_tb.cpp, %, $(notdir $(filter-out $(objs_basename), $(wildcard $(M_TESTS_DIR)/*_tb.cpp))))
 objs_verilate = $(addsuffix .verilate, $(objs_basename))
 objs_compile  = $(addprefix V, $(addsuffix .compile, $(objs_no_test)))
