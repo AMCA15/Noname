@@ -5,7 +5,7 @@
 */
 
 module wbu(clk_i, rst_i, wbm_dat_i, wbm_ack_i, wbm_err_i, wbm_re_i,
-            wbm_cyc_o, wbm_stb_o, wbm_dat_o, wbm_addr_o, wbm_we_o, wbm_sel_o);
+           wbm_cyc_o, wbm_stb_o, wbm_dat_o, wbm_addr_o, wbm_we_o, wbm_sel_o);
 
 	input wire clk_i;
 	input wire rst_i;

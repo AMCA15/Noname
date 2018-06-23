@@ -4,124 +4,87 @@
 * Luis Ruiz
 */
 
-module lsu_comb(clk_i, rst_i, mem_dat_i, mem_addr_i, mem_we_i, mem_re_i, mem_type_i, mem_sign_i, mem_err_o, mem_dat_o, 
-	lsu_dat_i, lsu_sel_o, lsu_addr_o, lsu_dat_o, lsu_we_o, lsu_re_o);
+module lsu_comb(clk_i, rst_i, funct3_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o, ld_data_fmt_o, st_sel_o,
+                e_ld_addr_mis_o, e_st_addr_mis_o);
+
+	localparam LB  = 3'b000;
+	localparam LH  = 3'b001;
+	localparam LW  = 3'b010;
+	localparam LBU = 3'b100;
+	localparam LHU = 3'b101;
+	localparam SB  = 3'b000;
+	localparam SH  = 3'b001;
+	localparam SW  = 3'b010;
 
 	input wire rst_i;
 	input wire clk_i;
 
-
-	input wire [31:0] mem_dat_i;
-	input wire [31:0] mem_addr_i;
-	input wire mem_we_i;
-	input wire mem_re_i;
-	input wire [1:0] mem_type_i;
-	input wire mem_sign_i;
-	input wire [31:0] lsu_dat_i;
-
-	output reg mem_err_o;
-	output reg [31:0] mem_dat_o;
-	output reg [3:0] lsu_sel_o;
-	output reg [31:0] lsu_addr_o;
-	output reg [31:0] lsu_dat_o;
-	output reg lsu_we_o;
-	output reg lsu_re_o;
-
-	localparam mem_type_word = 2'b11;
-	localparam mem_type_half = 2'b10;
-	localparam mem_type_byte = 2'b01;
+	input [2:0]   funct3_i;
+	input [31:0]  st_data_i;
+	input [31:0]  ld_data_i;
+	input [31:0]  addr_i;
+	output [31:0] st_data_fmt_o;
+	output [31:0] ld_data_fmt_o;
+	output [31:0] st_sel_o;
+	output e_ld_addr_mis_o;
+	output e_st_addr_mis_o;
 
 
-	//Circuito combinatorio
 	always @(*) begin
-		if(mem_we_i) begin
-			case(mem_type_i)
-				mem_type_word: begin
-					if(mem_addr_i[1:0]) begin
-						mem_err_o = 1;
-					end else begin
-						lsu_we_o = 1;
-						lsu_sel_o = 4'b1111;
-						lsu_addr_o = mem_addr_i;
-						lsu_dat_o = mem_dat_i;
-					end
-				end
-				mem_type_half: begin
-					if(mem_addr_i[0]) begin
-						mem_err_o = 1;
-					end else begin
-						lsu_we_o = 1;
-						lsu_dat_o = {mem_dat_i[15:0], mem_dat_i[15:0]};
-						lsu_addr_o = {mem_addr_i[31:2], 2'b00};
-						if(mem_addr_i[1])begin
-							lsu_sel_o = 4'b1100;
-						end else begin
-							lsu_sel_o = 4'b0011;
-						end
-					end
-				end
-				mem_type_byte: begin
-					lsu_we_o = 1;
-					lsu_dat_o = {mem_dat_i[7:0], mem_dat_i[7:0], mem_dat_i[7:0], mem_dat_i[7:0]};
-					lsu_addr_o = {mem_addr_i[31:2], 2'b00};
-					case(mem_addr_i[1:0])
-						2'b00: lsu_sel_o = 4'b0001;
-						2'b01: lsu_sel_o = 4'b0010;
-						2'b10: lsu_sel_o = 4'b0100;
-						2'b11: lsu_sel_o = 4'b1000;
-					endcase
-				end
-			endcase
-		end else if(mem_re_i)begin
-			case(mem_type_i)
-				mem_type_word: begin
-					if(mem_addr_i[1:0]) begin
-						mem_err_o = 1;
-					end else begin
-						lsu_re_o = 1;
-						lsu_addr_o = mem_addr_i;
-						mem_dat_o = lsu_dat_i;
-					end
-				end
-				mem_type_half: begin
-					if(mem_addr_i[0]) begin
-						mem_err_o = 1;
-					end else begin
-						lsu_re_o = 1;
-						lsu_addr_o = {mem_addr_i[31:2], 2'b00};
-						if(mem_addr_i[1])begin
-							if(mem_sign_i && lsu_dat_i[31]) mem_dat_o = {16'hFFFF,lsu_dat_i[31:16]};
-							else mem_dat_o = {16'h0000,lsu_dat_i[31:16]};
-						end else begin
-							if(mem_sign_i && lsu_dat_i[15]) mem_dat_o = {16'hFFFF,lsu_dat_i[15:0]};
-							else mem_dat_o = {16'h0000,lsu_dat_i[15:0]};
-						end
-					end
-				end
-				mem_type_byte: begin
-					lsu_re_o = 1;
-					lsu_addr_o = {mem_addr_i[31:2], 2'b00};
-					case(mem_addr_i[1:0])
-						2'b00: begin
-							if(mem_sign_i && lsu_dat_i[7]) mem_dat_o = {24'hFFFFFF,lsu_dat_i[7:0]};
-							else mem_dat_o = {24'h000000,lsu_dat_i[7:0]};
-						end
-						2'b01: begin
-							if(mem_sign_i && lsu_dat_i[15]) mem_dat_o = {24'hFFFFFF,lsu_dat_i[15:8]};
-							else mem_dat_o = {24'h000000,lsu_dat_i[15:8]};
-						end
-						2'b10: begin
-							if(mem_sign_i && lsu_dat_i[23]) mem_dat_o = {24'hFFFFFF,lsu_dat_i[23:16]};
-							else mem_dat_o = {24'h000000,lsu_dat_i[23:16]};
-						end
-						2'b11: begin
-							if(mem_sign_i && lsu_dat_i[31]) mem_dat_o = {24'hFFFFFF,lsu_dat_i[31:24]};
-							else mem_dat_o = {24'h000000,lsu_dat_i[31:24]};
-						end
-					endcase
-				end
-			endcase
-		end
+		case (funct3_i)
+			LB:  begin
+                case (addr_i[1:0])
+                    2'b00: ld_data_fmt_o = $signed(ld_data_i[7:0]);
+                    2'b01: ld_data_fmt_o = $signed(ld_data_i[15:8]);
+                    2'b10: ld_data_fmt_o = $signed(ld_data_i[23:16]);
+                    2'b11: ld_data_fmt_o = $signed(ld_data_i[31:24]);
+                endcase
+			end
+			LBU: begin
+                case (addr_i[1:0])
+                    2'b00: ld_data_fmt_o = ld_data_i[7:0];
+                    2'b01: ld_data_fmt_o = ld_data_i[15:8];
+                    2'b10: ld_data_fmt_o = ld_data_i[23:16];
+                    2'b11: ld_data_fmt_o = ld_data_i[31:24];
+                endcase
+			end
+			LH:  begin
+				e_ld_addr_mis_o = addr_i[0] ? 1 : 0;
+                case (addr_i[1])
+                    1'b0: ld_data_fmt_o = $signed(ld_data_i[15:0]);
+                    1'b1: ld_data_fmt_o = $signed(ld_data_i[31:16]);
+                endcase
+			end
+			LHU: begin
+				e_ld_addr_mis_o = addr_i[0] ? 1 : 0;
+                case (addr_i[1])
+                    1'b0: ld_data_fmt_o = ld_data_i[15:0];
+                    1'b1: ld_data_fmt_o = ld_data_i[31:16];
+                endcase
+			end
+			LW:  begin
+				e_ld_addr_mis_o = |addr_i[1:0] ? 1 : 0;
+				ld_data_fmt_o = ld_data_i;
+			end
+		endcase
 	end
 
+	always @(*) begin
+		case (funct3_i)
+			SB: begin
+        	    st_data_fmt_o = {4{st_data_i[7:0]}};
+        	    st_sel_o = 4'b0001 << addr_i[1:0];
+			end
+			SH: begin
+				e_st_addr_mis_o = addr_i[0] ? 1 : 0;
+        	    st_data_fmt_o = {2{st_data_i[15:0]}};
+        	    st_sel_o = addr_i[1] ? 4'b1100 : 4'b0011;
+			end
+			SW: begin
+				e_st_addr_mis_o = |addr_i[1:0] ? 1 : 0;
+        	    st_data_fmt_o = st_data_i;
+        	    st_sel_o = 4'b1111;
+			end
+		endcase
+	end
 endmodule

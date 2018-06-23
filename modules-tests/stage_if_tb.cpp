@@ -92,7 +92,7 @@ class SIMULATIONTB: public Testbench<Vstage_if> {
         memory(wbm_addr_o, wbm_dat_o, wbm_sel_o, wbm_cyc_o, wbm_stb_o, wbm_we_o, wbm_dat_i, wbm_ack_i, wbm_err_i);
 
         
-        if (wbm_ack_i && (!wbm_cyc_o && wbm_ack_i)) {
+        if (wbm_ack_i) {
           if(m_core->instruction_o != data[num_test][OUTPUT])
             return num_test;
           num_test++;

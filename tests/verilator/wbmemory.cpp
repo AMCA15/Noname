@@ -86,6 +86,8 @@ void WBMEMORY::operator()(const uint32_t wbs_addr_i, const uint32_t wbs_dat_i, c
         // check for access
         if (!(wbs_cyc_i && wbs_stb_i)){
                 // Reset the counter: transaction have been aborted.
+                wbs_ack_o  = 0;
+                wbs_err_o  = 0;
                 m_delay_cnt = 0;
                 return;
         }
