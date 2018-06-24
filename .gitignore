@@ -1,6 +1,7 @@
 # GTKWave
 *.vcd*
 *.gtkw
+!modules-tests/trace/*.gtkw
 
 # Object files
 *.o
