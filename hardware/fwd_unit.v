@@ -9,7 +9,7 @@
 module fwd_unit(
 						input         is_op_i,  
 						input         is_mem_i,
-						input 		  mem_ack_i,
+						input 		  	mem_ack_i,
 						input  [4:0]  rs1_i,			 
 						input  [4:0]  rs2_i,
 						input  [4:0]  EX_rd_i,			 // Sources 
@@ -35,7 +35,7 @@ module fwd_unit(
 			// Memory Operation
 			is_mem_i && mem_ack_i: begin
 			  dat_fwd_a_o = MEM_dat_i;
-			  is_fwd_a_o = (rs1_i == EX_rd_i) ? 1 : 0;
+			  is_fwd_a_o = (rs1_i == MEM_rd_i) ? 1 : 0;
 			end
 			default: is_fwd_a_o = 0;
 		endcase
@@ -52,7 +52,7 @@ module fwd_unit(
 			// Memory Operation
 			is_mem_i && mem_ack_i: begin
 			  dat_fwd_b_o = MEM_dat_i;
-			  is_fwd_b_o = (rs2_i == EX_rd_i) ? 1 : 0;
+			  is_fwd_b_o = (rs2_i == MEM_rd_i) ? 1 : 0;
 			end
 			default: is_fwd_b_o = 0;
 		endcase
