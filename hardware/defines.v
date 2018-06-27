@@ -40,6 +40,6 @@
 `define R_E_ILLEGAL_INST  64
 
 //----------------------   IF/ID   ------------------------------
-`define R_PC              63:0
+`define R_PC              63:32
 `define R_INSTRUCTION     31:0
 
