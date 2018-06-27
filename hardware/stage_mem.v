@@ -3,15 +3,15 @@
 * Anderson Contreras
 */
 
-module stage_mem(clk_i, rst_i, is_mem_i, we_mem_i, funct3_i, mem_data_i, mem_addr_i, mem_data_o,
+module stage_mem(clk_i, rst_i, is_ld_mem_i, is_st_mem_i, funct3_i, mem_data_i, mem_addr_i, mem_data_o,
                  wbm_dat_i, wbm_ack_i, wbm_err_i, wbm_cyc_o, wbm_stb_o, wbm_dat_o,
                  wbm_addr_o, wbm_we_o, wbm_sel_o, e_ld_addr_mis_o, e_st_addr_mis_o);
 
     input clk_i;
     input rst_i;
 
-    input is_mem_i;
-    input we_mem_i;
+    input is_ld_mem_i;
+    input is_st_mem_i;
     input [2:0] funct3_i;
     input [31:0] mem_data_i;
     input [31:0] mem_addr_i;
@@ -36,7 +36,7 @@ module stage_mem(clk_i, rst_i, is_mem_i, we_mem_i, funct3_i, mem_data_i, mem_add
     wire [31:0] ld_data_fmt;
 
     assign wbm_addr_o = mem_addr_i;
-    assign wbm_we_o   = we_mem_i;
+    assign wbm_we_o   = is_st_mem_i;
     assign wbm_sel_o  = st_sel;
     assign kill = e_ld_addr_mis_o || e_st_addr_mis_o;
 
@@ -58,7 +58,7 @@ module stage_mem(clk_i, rst_i, is_mem_i, we_mem_i, funct3_i, mem_data_i, mem_add
                  .wbm_dat_i(wbm_dat_i),
                  .wbm_ack_i(wbm_ack_i),
                  .wbm_err_i(wbm_err_i),
-                 .wbm_re_i(is_mem_i),
+                 .wbm_re_i(is_ld_mem_i),
                  .wbm_cyc_o(wbm_cyc_o),
                  .wbm_stb_o(wbm_stb_o),
                  .wbm_dat_o(wbm_dat_o),

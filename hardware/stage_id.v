@@ -5,7 +5,7 @@
 
 module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, is_fwd_b_i, dat_fwd_a_i, dat_fwd_b_i,
                 funct3_o, rs1_o, rs2_o, rd_o, alu_op_o, csr_addr_o, dat_a_o, dat_b_o, imm_out_o, is_op_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
-                is_mem_o, we_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);
+                is_ld_mem_o, is_st_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);
     
     // Mux control for ALU's inputs
     localparam SEL_REG  = 2'b00;
@@ -40,8 +40,8 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
     output is_jal_o;
     output is_jalr_o;
     output is_branch_o;
-    output is_mem_o;
-    output we_mem_o;
+    output is_ld_mem_o;
+    output is_st_mem_o;
     output is_misc_mem_o;
     output is_system_o;
     output e_illegal_inst_o;
@@ -70,8 +70,8 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
                        .is_jal_o(is_jal),
                        .is_jalr_o(is_jal),
                        .is_branch_o(is_branch),
-                       .is_mem_o(is_mem),
-                       .we_mem_o(we_mem_o),
+                       .is_ld_mem_o(is_ld_mem_o),
+                       .is_st_mem_o(is_st_mem_o),
                        .is_misc_mem_o(is_misc_mem),
                        .is_system_o(is_system),
                        .e_illegal_inst_o(e_illegal_inst_o));

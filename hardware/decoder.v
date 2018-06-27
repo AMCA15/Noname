@@ -8,7 +8,7 @@
 module decoder(clk_i, rst_i, instruction_i,
                funct3_o, rs1_o, rs2_o, rd_o, imm_op_o, sel_dat_a_o, sel_dat_b_o,
                alu_op_o, csr_addr_o, is_op_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
-               is_mem_o, we_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);
+               is_ld_mem_o, is_st_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);
 
   input clk_i;
   input rst_i;
@@ -71,8 +71,8 @@ module decoder(clk_i, rst_i, instruction_i,
   output is_jal_o;
   output is_jalr_o;
   output is_branch_o;
-  output is_mem_o;
-  output we_mem_o;
+  output is_ld_mem_o;
+  output is_st_mem_o;
   output is_misc_mem_o;
   output is_system_o;
   output e_illegal_inst_o;
@@ -94,8 +94,8 @@ module decoder(clk_i, rst_i, instruction_i,
     is_jal_o         = 0;
     is_jalr_o        = 0;
     is_branch_o      = 0;
-    is_mem_o         = 0;
-    we_mem_o         = 0;
+    is_ld_mem_o      = 0;
+    is_st_mem_o      = 0;
     is_misc_mem_o    = 0;
     is_system_o      = 0;
     e_illegal_inst_o = 0;
@@ -151,7 +151,7 @@ module decoder(clk_i, rst_i, instruction_i,
         sel_dat_b_o = SEL_IMM;
         imm_op_o    = IMM_I;
         alu_op_o    = ALU_ADD;
-        is_mem_o    = 1;
+        is_ld_mem_o    = 1;
       end
 
       STORE: begin
@@ -159,8 +159,7 @@ module decoder(clk_i, rst_i, instruction_i,
         sel_dat_b_o = SEL_IMM;
         imm_op_o    = IMM_S;
         alu_op_o    = ALU_ADD;
-        is_mem_o    = 1;
-        we_mem_o    = 1;
+        is_st_mem_o    = 1;
       end
 
       OP_IMM: begin

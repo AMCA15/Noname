@@ -33,13 +33,13 @@
 `define R_IS_JAL          71
 `define R_IS_JALR         70
 `define R_IS_BRANCH       69
-`define R_IS_MEM          68
-`define R_WE_MEM          67
+`define R_IS_LD_MEM       68
+`define R_IS_ST_MEM       67
 `define R_IS_MISC_MEM     66
 `define R_IS_SYSTEM       65
 `define R_E_ILLEGAL_INST  64
 
 //----------------------   IF/ID   ------------------------------
-`define R_INSTRUCTION     63:32
-`define R_PC              31:0
+`define R_PC              63:0
+`define R_INSTRUCTION     31:0
 

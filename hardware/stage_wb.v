@@ -4,7 +4,8 @@
 */
 
 module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, mem_addr_i, csr_addr_i, 
-                 e_illegal_inst_i, e_inst_addr_mis_i, e_ld_addr_mis_i, e_st_addr_mis_i, rd_o, rf_wd_o, we_rf_o, mtvec_o);
+                 e_illegal_inst_i, e_inst_addr_mis_i, e_ld_addr_mis_i, e_st_addr_mis_i, rd_o, rf_wd_o, we_rf_o, mtvec_o,
+                 is_exc_taken_o);
 
     // Opcodes used for wb
     localparam OP       = 7'b0110011;
@@ -30,10 +31,9 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     output [31:0] rf_wd_o;
     output we_rf_o;
     output [31:0] mtvec_o;
+    output is_exc_taken_o;
 
-
-
-    wire is_csr, csr_we_exc;
+    wire is_csr;
     wire [31:0] mcause; 
 
     reg [31:0] mstatus, mtval, csr_out;
@@ -44,7 +44,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
                 .addr_i(csr_addr_i),
                 .data_i(csr_data_i),
                 .is_csr_i(is_csr),
-                .we_exc_i(csr_we_exc),
+                .we_exc_i(is_exc_taken_o),
                 .mcause_d_i(mcause),
                 .mepc_d_i(pc_i),
                 .mtval_d_i(mtval),
@@ -61,7 +61,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
             e_ld_addr_mis_i:   mcause = 4;
             e_st_addr_mis_i:   mcause = 06;
         endcase  
-        csr_we_exc = e_ld_addr_mis_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
+        is_exc_taken_o = e_ld_addr_mis_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
     end
 
 
@@ -73,7 +73,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
             (funct3_i && SYSTEM) & is_csr: rf_wd_o = csr_out;
         endcase
         // Check if we need/can write to the registers
-        we_rf_o = (((OP || LOAD || (SYSTEM && is_csr))) && !csr_we_exc) ? 1 : 0;
+        we_rf_o = (((OP || LOAD || (SYSTEM && is_csr))) && !is_exc_taken_o) ? 1 : 0;
     end
 
 endmodule
