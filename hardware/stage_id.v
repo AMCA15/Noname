@@ -54,12 +54,15 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
     wire [31:0] rs1_d, rs2_d;
 
 
+    assign imm_out_o = imm_out;
+
+
     decoder id_decoder(.clk_i(clk_i),
                        .rst_i(rst_i),
                        .instruction_i(instruction_i),
                        .funct3_o(funct3),
-                       .rs1_o(rs1_d),
-                       .rs2_o(rs2_d),
+                       .rs1_o(rs1_o),
+                       .rs2_o(rs2_o),
                        .rd_o(rd_o),
                        .imm_op_o(imm_op),
                        .sel_dat_a_o(sel_dat_a),
@@ -80,8 +83,8 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
 
     reg_file id_reg_file(.clk_i(clk_i),
                          .rst_i(rst_i),
-                         .rs1_i(rs1),
-                         .rs2_i(rs2),
+                         .rs1_i(rs1_o),
+                         .rs2_i(rs2_o),
                          .rd_i(rd_i),
                          .rf_wd_i(rf_wd_i),
                          .we_i(rf_we_i),
