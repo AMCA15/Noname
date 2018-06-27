@@ -116,26 +116,10 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 
 	// Register behaviors
 	always @(posedge clk_i) begin
-		// IF/ID
-		if (!if_id_stall)
-			if_id_o <= if_id_i;
-		else if (if_id_flush)
-			if_id_o <= 32'h33;				// add zero, zero, zero
-		// ID/EXE
-		if (!id_exe_stall)
-			if_id_o <= if_id_i;
-		else if (id_exe_flush)
-			if_id_o <= 32'h33; 				// add zero, zero, zero
-		// EXE/MEM			
-		if (!exe_mem_stall)			
-			if_id_o <= if_id_i;			
-		else if (exe_mem_flush)			
-			if_id_o <= 32'h33; 				// add zero, zero, zero
-		// MEM/WB
-		if (!mem_wb_stall)
-			if_id_o <= if_id_i;
-		else if (mem_wb_flush)
-			if_id_o <= 32'h33; 				// add zero, zero, zero
+		if_id_o   <= (rst_i || if_id_flush)   ? `NOP : (if_id_stall)   ? if_id_o   : if_id_i;
+		id_exe_o  <= (rst_i || id_exe_flush)  ? `NOP : (id_exe_stall)  ? id_exe_o  : id_exe_i;
+		exe_mem_o <= (rst_i || exe_mem_flush) ? `NOP : (exe_mem_stall) ? exe_mem_o : exe_mem_i;
+		mem_wb_o  <= (rst_i || mem_wb_flush)  ? `NOP : (mem_wb_stall)  ? mem_wb_o  : mem_wb_i;
 	end
 
 
@@ -199,14 +183,16 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	// 						    Stage-IF
 
 	/* verilator lint_off PINMISSING */
-	stage_if core_stage_if(.clk_i(clk_i),
+	stage_if #(.RESET_ADDR(RESET_ADDR[31:0]))
+		     core_stage_if(.clk_i(clk_i),
 						   .rst_i(rst_i),
 						   .br_j_addr_i(br_j_addr),
 						   .exception_addr_i(exception_addr),
 						   .sel_addr_i({is_exception_taken, is_br_j_taken}),
 						   .stall_i(if_id_stall),
-						   .instruction_o(if_id_i[`R_INSTRUCTION]),
-						   .pc_o(if_id_i[`R_PC]),
+						   .instruction_o(if_id_instruction_i),
+						   .pc_o(if_id_pc_i),
+						   .wbm_dat_i(iwbm_dat_i),
 						   .wbm_ack_i(iwbm_ack_i),
 						   .wbm_cyc_o(iwbm_cyc_o),
 						   .wbm_stb_o(iwbm_stb_o),
@@ -255,8 +241,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 
 	stage_exe core_stage_exe(.clk_i(clk_i),
 							 .rst_i(rst_i),
-							 .pc_i(id_exe_o[`R_IMM_OUT]),
-							 .imm_i(id_exe_o[`R_DAT_A]),
+							 .pc_i(id_exe_o[`R_PC]),
+							 .imm_i(id_exe_o[`R_IMM_OUT]),
 							 .dat_a_i(id_exe_o[`R_DAT_A]),
 							 .dat_b_i(id_exe_o[`R_DAT_B]),
 							 .alu_op_i(id_exe_o[`R_ALU_OP]),
@@ -277,7 +263,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 							 .is_ld_mem_i(exe_mem_o[`R_IS_LD_MEM]),
 							 .is_st_mem_i(exe_mem_o[`R_IS_ST_MEM]),
 							 .funct3_i(exe_mem_o[`R_FUNCT3]),
-							 .mem_data_i(),
+							 .mem_data_i(exe_mem_o[`R_ALU_OUT]),
 							 .mem_addr_i(),
 							 .mem_data_o(mem_wb_i[`R_MEM_DATA_O]),
 							 .wbm_dat_i(dwbm_dat_i),

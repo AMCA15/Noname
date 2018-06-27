@@ -1,27 +1,179 @@
 [*]
 [*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
-[*] Sun Jun 24 22:21:47 2018
+[*] Wed Jun 27 16:31:54 2018
 [*]
 [dumpfile] "..\..\build\vcd\trace.vcd"
-[dumpfile_mtime] "Sun Jun 24 22:04:40 2018"
-[dumpfile_size] 331905
-[timestart] 509
+[dumpfile_mtime] "Wed Jun 27 15:14:14 2018"
+[dumpfile_size] 1763896
+[timestart] 5
 [size] 1366 705
-[pos] -294 -60
-*-5.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -35 -35
+*-7.000000 83 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.top.
 [treeopen] TOP.top.cpu.
 [sst_width] 192
 [signals_width] 206
 [sst_expanded] 1
-[sst_vpaned_height] 196
+[sst_vpaned_height] 369
+@200
+-Registers
 @28
 TOP.clk_i
 TOP.rst_i
+@c00022
+TOP.top.cpu.if_id_i[63:0]
+@28
+(0)TOP.top.cpu.if_id_i[63:0]
+(1)TOP.top.cpu.if_id_i[63:0]
+(2)TOP.top.cpu.if_id_i[63:0]
+(3)TOP.top.cpu.if_id_i[63:0]
+(4)TOP.top.cpu.if_id_i[63:0]
+(5)TOP.top.cpu.if_id_i[63:0]
+(6)TOP.top.cpu.if_id_i[63:0]
+(7)TOP.top.cpu.if_id_i[63:0]
+(8)TOP.top.cpu.if_id_i[63:0]
+(9)TOP.top.cpu.if_id_i[63:0]
+(10)TOP.top.cpu.if_id_i[63:0]
+(11)TOP.top.cpu.if_id_i[63:0]
+(12)TOP.top.cpu.if_id_i[63:0]
+(13)TOP.top.cpu.if_id_i[63:0]
+(14)TOP.top.cpu.if_id_i[63:0]
+(15)TOP.top.cpu.if_id_i[63:0]
+(16)TOP.top.cpu.if_id_i[63:0]
+(17)TOP.top.cpu.if_id_i[63:0]
+(18)TOP.top.cpu.if_id_i[63:0]
+(19)TOP.top.cpu.if_id_i[63:0]
+(20)TOP.top.cpu.if_id_i[63:0]
+(21)TOP.top.cpu.if_id_i[63:0]
+(22)TOP.top.cpu.if_id_i[63:0]
+(23)TOP.top.cpu.if_id_i[63:0]
+(24)TOP.top.cpu.if_id_i[63:0]
+(25)TOP.top.cpu.if_id_i[63:0]
+(26)TOP.top.cpu.if_id_i[63:0]
+(27)TOP.top.cpu.if_id_i[63:0]
+(28)TOP.top.cpu.if_id_i[63:0]
+(29)TOP.top.cpu.if_id_i[63:0]
+(30)TOP.top.cpu.if_id_i[63:0]
+(31)TOP.top.cpu.if_id_i[63:0]
+(32)TOP.top.cpu.if_id_i[63:0]
+(33)TOP.top.cpu.if_id_i[63:0]
+(34)TOP.top.cpu.if_id_i[63:0]
+(35)TOP.top.cpu.if_id_i[63:0]
+(36)TOP.top.cpu.if_id_i[63:0]
+(37)TOP.top.cpu.if_id_i[63:0]
+(38)TOP.top.cpu.if_id_i[63:0]
+(39)TOP.top.cpu.if_id_i[63:0]
+(40)TOP.top.cpu.if_id_i[63:0]
+(41)TOP.top.cpu.if_id_i[63:0]
+(42)TOP.top.cpu.if_id_i[63:0]
+(43)TOP.top.cpu.if_id_i[63:0]
+(44)TOP.top.cpu.if_id_i[63:0]
+(45)TOP.top.cpu.if_id_i[63:0]
+(46)TOP.top.cpu.if_id_i[63:0]
+(47)TOP.top.cpu.if_id_i[63:0]
+(48)TOP.top.cpu.if_id_i[63:0]
+(49)TOP.top.cpu.if_id_i[63:0]
+(50)TOP.top.cpu.if_id_i[63:0]
+(51)TOP.top.cpu.if_id_i[63:0]
+(52)TOP.top.cpu.if_id_i[63:0]
+(53)TOP.top.cpu.if_id_i[63:0]
+(54)TOP.top.cpu.if_id_i[63:0]
+(55)TOP.top.cpu.if_id_i[63:0]
+(56)TOP.top.cpu.if_id_i[63:0]
+(57)TOP.top.cpu.if_id_i[63:0]
+(58)TOP.top.cpu.if_id_i[63:0]
+(59)TOP.top.cpu.if_id_i[63:0]
+(60)TOP.top.cpu.if_id_i[63:0]
+(61)TOP.top.cpu.if_id_i[63:0]
+(62)TOP.top.cpu.if_id_i[63:0]
+(63)TOP.top.cpu.if_id_i[63:0]
+@1401200
+-group_end
+@c00022
+[color] 4
+TOP.top.cpu.if_id_o[63:0]
+@28
+(0)TOP.top.cpu.if_id_o[63:0]
+(1)TOP.top.cpu.if_id_o[63:0]
+(2)TOP.top.cpu.if_id_o[63:0]
+(3)TOP.top.cpu.if_id_o[63:0]
+(4)TOP.top.cpu.if_id_o[63:0]
+(5)TOP.top.cpu.if_id_o[63:0]
+(6)TOP.top.cpu.if_id_o[63:0]
+(7)TOP.top.cpu.if_id_o[63:0]
+(8)TOP.top.cpu.if_id_o[63:0]
+(9)TOP.top.cpu.if_id_o[63:0]
+(10)TOP.top.cpu.if_id_o[63:0]
+(11)TOP.top.cpu.if_id_o[63:0]
+(12)TOP.top.cpu.if_id_o[63:0]
+(13)TOP.top.cpu.if_id_o[63:0]
+(14)TOP.top.cpu.if_id_o[63:0]
+(15)TOP.top.cpu.if_id_o[63:0]
+(16)TOP.top.cpu.if_id_o[63:0]
+(17)TOP.top.cpu.if_id_o[63:0]
+(18)TOP.top.cpu.if_id_o[63:0]
+(19)TOP.top.cpu.if_id_o[63:0]
+(20)TOP.top.cpu.if_id_o[63:0]
+(21)TOP.top.cpu.if_id_o[63:0]
+(22)TOP.top.cpu.if_id_o[63:0]
+(23)TOP.top.cpu.if_id_o[63:0]
+(24)TOP.top.cpu.if_id_o[63:0]
+(25)TOP.top.cpu.if_id_o[63:0]
+(26)TOP.top.cpu.if_id_o[63:0]
+(27)TOP.top.cpu.if_id_o[63:0]
+(28)TOP.top.cpu.if_id_o[63:0]
+(29)TOP.top.cpu.if_id_o[63:0]
+(30)TOP.top.cpu.if_id_o[63:0]
+(31)TOP.top.cpu.if_id_o[63:0]
+(32)TOP.top.cpu.if_id_o[63:0]
+(33)TOP.top.cpu.if_id_o[63:0]
+(34)TOP.top.cpu.if_id_o[63:0]
+(35)TOP.top.cpu.if_id_o[63:0]
+(36)TOP.top.cpu.if_id_o[63:0]
+(37)TOP.top.cpu.if_id_o[63:0]
+(38)TOP.top.cpu.if_id_o[63:0]
+(39)TOP.top.cpu.if_id_o[63:0]
+(40)TOP.top.cpu.if_id_o[63:0]
+(41)TOP.top.cpu.if_id_o[63:0]
+(42)TOP.top.cpu.if_id_o[63:0]
+(43)TOP.top.cpu.if_id_o[63:0]
+(44)TOP.top.cpu.if_id_o[63:0]
+(45)TOP.top.cpu.if_id_o[63:0]
+(46)TOP.top.cpu.if_id_o[63:0]
+(47)TOP.top.cpu.if_id_o[63:0]
+(48)TOP.top.cpu.if_id_o[63:0]
+(49)TOP.top.cpu.if_id_o[63:0]
+(50)TOP.top.cpu.if_id_o[63:0]
+(51)TOP.top.cpu.if_id_o[63:0]
+(52)TOP.top.cpu.if_id_o[63:0]
+(53)TOP.top.cpu.if_id_o[63:0]
+(54)TOP.top.cpu.if_id_o[63:0]
+(55)TOP.top.cpu.if_id_o[63:0]
+(56)TOP.top.cpu.if_id_o[63:0]
+(57)TOP.top.cpu.if_id_o[63:0]
+(58)TOP.top.cpu.if_id_o[63:0]
+(59)TOP.top.cpu.if_id_o[63:0]
+(60)TOP.top.cpu.if_id_o[63:0]
+(61)TOP.top.cpu.if_id_o[63:0]
+(62)TOP.top.cpu.if_id_o[63:0]
+(63)TOP.top.cpu.if_id_o[63:0]
+@1401200
+-group_end
+@22
+[color] 4
+TOP.top.cpu.id_exe_i[224:0]
+TOP.top.cpu.id_exe_o[224:0]
+TOP.top.cpu.exe_mem_i[257:0]
+TOP.top.cpu.exe_mem_o[257:0]
+TOP.top.cpu.mem_wb_i[291:0]
+TOP.top.cpu.mem_wb_o[291:0]
 @200
 -
 -Stage IF
+@28
+TOP.clk_i
+TOP.rst_i
 @22
 TOP.top.cpu.iwbm_addr_o[31:0]
 @28
@@ -30,14 +182,16 @@ TOP.top.cpu.iwbm_stb_o
 TOP.top.cpu.iwbm_ack_i
 @22
 TOP.top.cpu.iwbm_dat_i[31:0]
-TOP.top.cpu.core_stage_if.wbm_dat_i[31:0]
-TOP.top.cpu.core_stage_if.wbm_addr_o[31:0]
 @28
 TOP.top.cpu.core_stage_if.wbm_cyc_o
 TOP.top.cpu.core_stage_if.wbm_stb_o
 TOP.top.cpu.core_stage_if.wbm_ack_i
 @22
 TOP.top.cpu.core_stage_if.pc_o[31:0]
+@23
+[color] 4
+TOP.top.cpu.core_stage_if.pc_o[31:0]
+@22
 TOP.top.cpu.core_stage_if.instruction_o[31:0]
 TOP.top.cpu.core_stage_if.exception_addr_i[31:0]
 @28
@@ -47,10 +201,16 @@ TOP.top.cpu.core_stage_if.br_j_addr_i[31:0]
 TOP.top.cpu.core_stage_if.exception_addr_i[31:0]
 @28
 TOP.top.cpu.core_stage_if.stall_i
+TOP.top.cpu.if_id_flush
 @200
 -
 -Stage ID
+@28
+TOP.clk_i
+TOP.top.rst_i
 @22
+TOP.top.cpu.id_exe_o[224:0]
+TOP.top.cpu.core_stage_id.pc_i[31:0]
 TOP.top.cpu.core_stage_id.instruction_i[31:0]
 @28
 TOP.top.cpu.core_stage_id.funct3_o[2:0]
@@ -72,74 +232,36 @@ TOP.top.cpu.core_stage_id.is_auipc_o
 TOP.top.cpu.core_stage_id.is_jal_o
 TOP.top.cpu.core_stage_id.is_jalr_o
 TOP.top.cpu.core_stage_id.is_branch_o
-TOP.top.cpu.core_stage_id.is_mem_o
-TOP.top.cpu.core_stage_id.we_mem_o
 TOP.top.cpu.core_stage_id.is_misc_mem_o
 TOP.top.cpu.core_stage_id.is_system_o
 TOP.top.cpu.core_stage_id.e_illegal_inst_o
+TOP.top.cpu.id_exe_stall
+TOP.top.cpu.id_exe_flush
 @200
 -
 -Stage EXE
-@22
-TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
-TOP.top.cpu.core_stage_exe.dat_b_i[31:0]
-TOP.top.cpu.core_stage_exe.alu_op_i[3:0]
-TOP.top.cpu.core_stage_exe.alu_out_o[31:0]
-TOP.top.cpu.core_stage_exe.imm_i[31:0]
 @28
-TOP.top.cpu.core_stage_exe.is_jal_inst_i
-TOP.top.cpu.core_stage_exe.is_jalr_inst_i
-TOP.top.cpu.core_stage_exe.is_br_inst_i
-TOP.top.cpu.core_stage_exe.is_br_j_taken_o
-@22
-TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+TOP.top.clk_i
+TOP.rst_i
 @200
 -
 -Stage MEM
-@22
-TOP.top.cpu.core_stage_mem.mem_data_i[31:0]
-TOP.top.cpu.core_stage_mem.mem_addr_i[31:0]
-TOP.top.cpu.core_stage_mem.mem_data_o[31:0]
 @28
-TOP.top.cpu.core_stage_mem.is_mem_i
-TOP.top.cpu.core_stage_mem.e_ld_addr_mis_o
-TOP.top.cpu.core_stage_mem.e_st_addr_mis_o
+TOP.top.cpu.exe_mem_stall
+TOP.top.cpu.exe_mem_flush
 @200
 -
 -Stage WB
-@22
-TOP.top.cpu.core_stage_wb.rd_o[4:0]
-TOP.top.cpu.core_stage_wb.rf_wd_o[31:0]
 @28
-TOP.top.cpu.core_stage_wb.we_rf_o
-TOP.top.cpu.core_stage_wb.is_csr
-@22
-TOP.top.cpu.core_stage_wb.csr_addr_i[31:0]
-@28
-TOP.top.cpu.core_stage_wb.csr_data_i
-TOP.top.cpu.core_stage_wb.csr_we_exc
-@23
-TOP.top.cpu.core_stage_wb.mtvec_o[31:0]
-@28
-TOP.top.cpu.core_stage_wb.funct3_i[2:0]
+TOP.clk_i
+TOP.rst_i
+TOP.top.cpu.mem_wb_stall
+TOP.top.cpu.mem_wb_flush
 @200
 -
 -Forwarding
-@22
-TOP.top.cpu.core_fwd_unit.rs1_i[4:0]
-TOP.top.cpu.core_fwd_unit.rs2_i[4:0]
-TOP.top.cpu.core_fwd_unit.EX_rd_i[4:0]
-TOP.top.cpu.core_fwd_unit.EX_dat_i[31:0]
-TOP.top.cpu.core_fwd_unit.MEM_rd_i[4:0]
-TOP.top.cpu.core_fwd_unit.MEM_dat_i[31:0]
 @28
-TOP.top.cpu.core_fwd_unit.is_op_i
-TOP.top.cpu.core_fwd_unit.is_mem_i
-TOP.top.cpu.core_fwd_unit.mem_ack_i
-TOP.top.cpu.core_fwd_unit.is_fwd_a_o
-TOP.top.cpu.core_fwd_unit.is_fwd_b_o
-@22
-TOP.top.cpu.core_fwd_unit.dat_fwd_a_o[31:0]
-TOP.top.cpu.core_fwd_unit.dat_fwd_b_o[31:0]
+TOP.clk_i
+TOP.rst_i
 [pattern_trace] 1
 [pattern_trace] 0

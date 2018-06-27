@@ -3,8 +3,6 @@
 * MANUEL HURTADO
 */
 
-//Currently the clk_i and rst_i are only for simulation purposes
-
 module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, we_exc_i, mcause_d_i, mepc_d_i, mtval_d_i,
             mstatus_d_i, data_out_o, mtvec_o);
     
@@ -83,8 +81,27 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, we_exc_i, mcause_d_
             CSRRC: dat <= register[addr_i] & !data_i;
         endcase
 
+        if (rst_i) begin
+    	    register[MISA_REG]       <= 0; // 1 misa		    0x301
+            register[MVENDORID_REG]  <= 0; // 2 mvendorid	    0xF11
+            register[MARCHID_REG]    <= 0; // 3 marchid		    0xF12
+            register[MIMPID_REG]     <= 0; // 4 mimpid 		    0xF13
+            register[MHARTID_REG]    <= 0; // 5 mhartid		    0xF14
+            register[MCAUSE_REG]     <= 0; // 6 mcause		    0x342
+            register[MSTATUS_REG]    <= 0; // 7 mtatus		    0x300
+            register[MTVEC_REG]      <= 0; // 8 mtvec		    0x305
+            register[MEPC_REG]       <= 0; // 9 mepc		    0x341
+            register[MIP_REG]        <= 0; // 10 mip 		    0x344
+            register[MIE_REG]        <= 0; // 11 mie 		    0x304
+            register[MCYCLE_REG]     <= 0; // 12 mcycle 	    0xB00
+            register[MYCLEH_REG]     <= 0; // 13 mycleh 	    0xB80
+            register[MINSTRET_REG]   <= 0; // 14 minstret 	    0xB02
+            register[MINSTRETH_REG]  <= 0; // 15 minstreth 	    0xB82
+            register[MCOUNTEREN_REG] <= 0; // 16 mcounteren     0x306
+        end
+
         // If it's a CSR instruction write the new data in the register
-        if (is_csr_i) begin   
+        else if (is_csr_i) begin   
             case (addr_i) 
                 MISA_ADDR       : register[MISA_REG]       <= dat; // 1 misa	            0x301
                 MVENDORID_ADDR  : register[MVENDORID_REG]  <= dat; // 2 mvendorid	        0xF11

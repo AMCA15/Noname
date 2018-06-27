@@ -19,8 +19,7 @@ module fwd_unit(
 						output 		  is_fwd_a_o,        // Output 1 (Mux control signal)
 						output 		  is_fwd_b_o,        // Output 2 (Mux control signal)
 						output [31:0] dat_fwd_a_o,
-						output [31:0] dat_fwd_b_o,
-						output stall
+						output [31:0] dat_fwd_b_o
 						);
 
 

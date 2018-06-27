@@ -184,8 +184,6 @@ module decoder(clk_i, rst_i, instruction_i,
         alu_op_o    = {instruction_i[30], funct3_o};
       end
 
-
-
       MISC_MEM: begin
         is_misc_mem_o = 1;
       end

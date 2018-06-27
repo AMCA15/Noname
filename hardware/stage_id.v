@@ -48,6 +48,7 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
 
     
     wire [2:0]  imm_op;
+    wire [31:0] imm_out;
     wire [2:0]  sel_dat_a;
     wire [2:0]  sel_dat_b;
     wire [31:0] rs1_d, rs2_d;
@@ -65,15 +66,16 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
                        .sel_dat_b_o(sel_dat_b),
                        .alu_op_o(alu_op_o),
                        .csr_addr_o(csr_addr_o),
-                       .is_lui_o(is_lui),
-                       .is_auipc_o(is_auipc),
-                       .is_jal_o(is_jal),
-                       .is_jalr_o(is_jal),
-                       .is_branch_o(is_branch),
+                       .is_op_o(is_op_o),
+                       .is_lui_o(is_lui_o),
+                       .is_auipc_o(is_auipc_o),
+                       .is_jal_o(is_jal_o),
+                       .is_jalr_o(is_jalr_o),
+                       .is_branch_o(is_branch_o),
                        .is_ld_mem_o(is_ld_mem_o),
                        .is_st_mem_o(is_st_mem_o),
-                       .is_misc_mem_o(is_misc_mem),
-                       .is_system_o(is_system),
+                       .is_misc_mem_o(is_misc_mem_o),
+                       .is_system_o(is_system_o),
                        .e_illegal_inst_o(e_illegal_inst_o));
 
     reg_file id_reg_file(.clk_i(clk_i),

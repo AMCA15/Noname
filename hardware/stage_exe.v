@@ -31,7 +31,7 @@ module stage_exe(clk_i, rst_i, pc_i, imm_i, dat_a_i, dat_b_i, alu_op_i, funct3_i
 	wire branch_res;
 
 
-	assign br_j_addr_o = is_br_inst_i ? pc_i + imm_i : alu_out_o;
+	assign br_j_addr_o = pc_i + imm_i;
 	assign e_inst_addr_mis_o = |br_j_addr_o[1:0];
 	assign is_br_j_taken_o = ((branch_res & is_br_inst_i) | is_jal_inst_i | is_jalr_inst_i) & !e_inst_addr_mis_o;
 

@@ -7,6 +7,8 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i
                 instruction_o, pc_o, wbm_dat_i, wbm_ack_i, wbm_err_i,
                 wbm_cyc_o, wbm_stb_o, wbm_dat_o, wbm_addr_o, wbm_we_o, wbm_sel_o);
   
+  parameter [31:0] RESET_ADDR       = 32'h0;
+
   localparam SECUENTIAL_ADDR = 2'b00;
   localparam BRANCH_ADDR     = 2'b01;
   localparam EXCEPTION_ADDR  = 2'b10;
@@ -41,11 +43,11 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i
   assign wbm_we_o = 0;
   assign wbm_sel  = 0;
   assign wbm_addr_o = pc_o;
-  
+
 
   wbu if_wbu (.clk_i(clk_i),
             .rst_i(rst_i),
-            .wbm_dat_i(instruction_o),
+            .wbm_dat_i(wbm_dat_i),
             .wbm_ack_i(wbm_ack_i),
             .wbm_err_i(wbm_err_i),
             .wbm_re_i(wbm_re),
@@ -59,10 +61,10 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i
   // PC's
   always @(posedge clk_i) begin
     if (rst_i) begin
-      pc_o = 32'h7FFFFFFC;
+      pc_o          = RESET_ADDR - 4;
+      instruction_o = `NOP;
     end
     else if (!stall_i && !wbm_cyc_o) begin
-
       case (sel_addr_i)
         SECUENTIAL_ADDR: pc_o = pc_o + 4;
         BRANCH_ADDR:     pc_o = br_j_addr_i;
@@ -72,6 +74,7 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i
   end
 
   always @(posedge wbm_ack_i) begin
-    instruction_o = wbm_dat_i;
+    instruction_o = wbm_ack_i ? wbm_dat_i : instruction_o;
   end
+
 endmodule
