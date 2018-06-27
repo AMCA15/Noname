@@ -4,7 +4,7 @@
 */
 
 `include "defines.v"
-
+// Debug
 module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_stb_o, iwbm_addr_o,
 			 dwbm_ack_i, dwbm_err_i, dwbm_dat_i, dwbm_we_o, dwbm_cyc_o, dwbm_stb_o, dwbm_sel_o, dwbm_addr_o, dwbm_dat_o,
 			 xint_meip_i, xint_mtip_i, xint_msip_i);
