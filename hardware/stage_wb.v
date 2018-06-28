@@ -11,6 +11,8 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     localparam OP       = 7'b0110011;
     localparam LOAD     = 7'b0000011;
     localparam SYSTEM   = 7'b1110011;
+    localparam JAL      = 7'b1101111;
+    localparam JALR     = 7'b1100111;
 
     input clk_i;
     input rst_i;
@@ -64,13 +66,22 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
         is_exc_taken_o = e_ld_addr_mis_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
     end
 
-
+    wire [6:0] opcode;
+    assign opcode = instruction_i[6:0];
+       
     // Write-Back Mux
     always @(*) begin
-        case (1'b1)
-            funct3_i && OP:                rf_wd_o = alu_d_i;
-            funct3_i && LOAD:              rf_wd_o = mem_d_i;
-            (funct3_i && SYSTEM) & is_csr: rf_wd_o = csr_out;
+
+        is_csr = funct3_i ? 1 : 0;
+        
+        case (opcode)
+            OP:                   rf_wd_o = alu_d_i;
+            LOAD:                 rf_wd_o = mem_d_i;
+            SYSTEM: begin              if(is_csr) 
+                                            rf_wd_o = csr_out;
+                    end
+            JAL:                  rf_wd_o = pc_i + 3'b100;
+            JALR:                 rf_wd_o = pc_i + 3'b100;
         endcase
         // Check if we need/can write to the registers
         we_rf_o = (((OP || LOAD || (SYSTEM && is_csr))) && !is_exc_taken_o) ? 1 : 0;
