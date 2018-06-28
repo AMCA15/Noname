@@ -64,11 +64,11 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i
       pc_o          = RESET_ADDR - 4;
       instruction_o = `NOP;
     end
-    else if (!stall_i && !wbm_cyc_o) begin
+    else begin
       case (sel_addr_i)
-        SECUENTIAL_ADDR: pc_o = pc_o + 4;
-        BRANCH_ADDR:     pc_o = br_j_addr_i;
-        EXCEPTION_ADDR:  pc_o = exception_addr_i;
+        SECUENTIAL_ADDR: if (!stall_i && !wbm_cyc_o) pc_o = pc_o + 4;
+        BRANCH_ADDR:     pc_o = (!stall_i && !wbm_cyc_o)? br_j_addr_i:br_j_addr_i-4;
+        EXCEPTION_ADDR:  pc_o = (!stall_i && !wbm_cyc_o)? exception_addr_i:exception_addr_i-4;
       endcase
     end
   end

@@ -46,8 +46,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 
 	//---------------------------------------------------------------
 	// 						       IF/ID
-	wire if_id_stall;
-	wire if_id_flush = is_br_j_taken | is_exc_taken;
+	wire if_id_stall ;
+	wire if_id_flush = is_br_j_taken || is_exc_taken || (iwbm_cyc_o&&!if_id_stall) ;
 	wire [63:0] if_id_i = {if_id_pc_i, if_id_instruction_i};
 	reg  [63:0] if_id_o;
 	
@@ -115,7 +115,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	//---------------------------------------------------------------
 
 	// Register behaviors
-	always @(posedge clk_i) begin
+	always @(negedge clk_i) begin
 		if_id_o   <= (rst_i || if_id_flush)   ? `NOP : (if_id_stall)   ? if_id_o   : if_id_i;
 		id_exe_o  <= (rst_i || id_exe_flush)  ? `NOP : (id_exe_stall)  ? id_exe_o  : id_exe_i;
 		exe_mem_o <= (rst_i || exe_mem_flush) ? `NOP : (exe_mem_stall) ? exe_mem_o : exe_mem_i;
