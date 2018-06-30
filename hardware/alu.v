@@ -10,9 +10,7 @@
 * Anderson Contreras
 */
 
-//Currently the clk_i and rst_i are only for simulation purposes
-
-module alu(clk_i, rst_i, in0_i, in1_i, op_i, equ_o, lt_o, ltu_o, out_o);
+module alu(in0_i, in1_i, op_i, equ_o, lt_o, ltu_o, out_o);
   localparam ALU_ADD  = 4'b0000;
   localparam ALU_SUB  = 4'b1000;
   localparam ALU_AND  = 4'b0111;
@@ -24,8 +22,6 @@ module alu(clk_i, rst_i, in0_i, in1_i, op_i, equ_o, lt_o, ltu_o, out_o);
   localparam ALU_SLT  = 4'b0010;
   localparam ALU_SLTU = 4'b0011;
 
-  input clk_i;
-  input rst_i;
 
   input signed [31:0] in0_i;
   input signed [31:0] in1_i;
@@ -53,6 +49,7 @@ module alu(clk_i, rst_i, in0_i, in1_i, op_i, equ_o, lt_o, ltu_o, out_o);
 
 
   always @(*) begin
+    /* verilator lint_off CASEINCOMPLETE */
     case(op_i)
       ALU_ADD:  out_o = add_res;
       ALU_SUB:  out_o = sub_res;
@@ -65,5 +62,6 @@ module alu(clk_i, rst_i, in0_i, in1_i, op_i, equ_o, lt_o, ltu_o, out_o);
       ALU_SLT:  out_o = slt_res;
       ALU_SLTU: out_o = sltu_res;
     endcase
+    /* verilator lint_on CASEINCOMPLETE */
   end
 endmodule

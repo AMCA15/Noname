@@ -4,9 +4,8 @@
 * Anderson Contreras
 */
 
-//Currently the clk_i and rst_i are only for simulation purposes
 
-module imm_gen(clk_i, rst_i, instruction_i, imm_op_i, imm_o);
+module imm_gen(instruction_i, imm_op_i, imm_o);
   localparam IMM_I = 0'b000;
   localparam IMM_S = 0'b001;
   localparam IMM_B = 0'b010;
@@ -14,9 +13,6 @@ module imm_gen(clk_i, rst_i, instruction_i, imm_op_i, imm_o);
   localparam IMM_J = 0'b100;
   localparam IMM_C = 0'b101;
   localparam IMM_SH = 0'b110; //Shamt for shift
-
-  input clk_i;
-  input rst_i;
 
   input  [2:0] imm_op_i;
   input  [31:0] instruction_i;

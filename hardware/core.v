@@ -32,7 +32,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	output dwbm_we_o;
 	output dwbm_cyc_o;
 	output dwbm_stb_o;
-	output [2:0] dwbm_sel_o;
+	output [3:0] dwbm_sel_o;
 	output [31:0] dwbm_addr_o;
 	output [31:0] dwbm_dat_o;
 	// Interrupts
@@ -47,7 +47,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	//---------------------------------------------------------------
 	// 						       IF/ID
 	wire if_id_stall ;
-	wire if_id_flush = is_br_j_taken || is_exc_taken || (iwbm_cyc_o&&!if_id_stall) ;
+	wire if_id_flush = is_br_j_taken || is_exc_taken;
 	wire [63:0] if_id_i = {if_id_pc_i, if_id_instruction_i};
 	reg  [63:0] if_id_o;
 	
@@ -59,11 +59,11 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	// 						       ID/EXE
 	wire id_exe_stall;
 	wire id_exe_flush = is_br_j_taken | is_exc_taken;
-	wire [224:0] id_exe_i = {id_exe_funct3_i, id_exe_rs1_i, id_exe_rs2_i, id_exe_rd_i, id_exe_alu_op_i,
+	wire [204:0] id_exe_i = {id_exe_funct3_i, id_exe_rs1_i, id_exe_rs2_i, id_exe_rd_i, id_exe_alu_op_i,
  							 id_exe_csr_addr_i, id_exe_dat_a_i, id_exe_dat_b_i, id_exe_imm_out_i, id_exe_is_op_i, id_exe_is_lui_i, id_exe_is_auipc_i,
  							 id_exe_is_jal_i, id_exe_is_jalr_i, id_exe_is_branch_i, id_exe_is_ld_mem_i, id_exe_is_st_mem_i,
  							 id_exe_is_misc_mem_i, id_exe_is_system_i, id_exe_e_illegal_inst_i, if_id_o};
-	reg  [224:0] id_exe_o;
+	reg  [204:0] id_exe_o;
 
 
 	// Signals
@@ -92,8 +92,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	// 						      EXE/MEM
 	wire exe_mem_stall;
 	wire exe_mem_flush = is_exc_taken;
-	wire [257:0] exe_mem_i = {exe_mem_e_inst_addr_mis_o, exe_mem_alu_out_i, id_exe_o};
-	reg  [257:0] exe_mem_o;
+	wire [237:0] exe_mem_i = {exe_mem_e_inst_addr_mis_o, exe_mem_alu_out_i, id_exe_o};
+	reg  [237:0] exe_mem_o;
 
 	// Signals
 	wire exe_mem_e_inst_addr_mis_o;
@@ -104,8 +104,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	// 						      MEM/WB
 	wire mem_wb_stall;
 	wire mem_wb_flush = is_exc_taken;
-	wire [291:0] mem_wb_i = {mem_wb_mem_data_i, mem_wb_e_ld_addr_mis_i, mem_wb_e_st_addr_mis_i, exe_mem_o};
-	reg  [291:0] mem_wb_o;
+	wire [271:0] mem_wb_i = {mem_wb_mem_data_i, mem_wb_e_ld_addr_mis_i, mem_wb_e_st_addr_mis_i, exe_mem_o};
+	reg  [271:0] mem_wb_o;
 
 	// Signals
 	wire [31:0] mem_wb_mem_data_i;
@@ -194,6 +194,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 						   .pc_o(if_id_pc_i),
 						   .wbm_dat_i(iwbm_dat_i),
 						   .wbm_ack_i(iwbm_ack_i),
+						   .wbm_err_i(iwbm_err_i),
 						   .wbm_cyc_o(iwbm_cyc_o),
 						   .wbm_stb_o(iwbm_stb_o),
 						   .wbm_addr_o(iwbm_addr_o));
@@ -204,7 +205,6 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	// 						   Stage-ID
 
 	stage_id core_stage_id(.clk_i(clk_i),
-						   .rst_i(rst_i),
 						   .instruction_i(if_id_o[`R_INSTRUCTION]),
 						   .pc_i(if_id_o[`R_PC]),
 						   .rd_i(rf_w),
@@ -239,9 +239,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	//---------------------------------------------------------------
 	// 						   Stage-EXE
 
-	stage_exe core_stage_exe(.clk_i(clk_i),
-							 .rst_i(rst_i),
-							 .pc_i(id_exe_o[`R_PC]),
+	stage_exe core_stage_exe(.pc_i(id_exe_o[`R_PC]),
 							 .imm_i(id_exe_o[`R_IMM_OUT]),
 							 .dat_a_i(id_exe_o[`R_DAT_A]),
 							 .dat_b_i(id_exe_o[`R_DAT_B]),
@@ -290,6 +288,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 						   .mem_d_i(mem_wb_o[`R_MEM_DATA_O]),
 						   .mem_addr_i(),
 						   .csr_addr_i(mem_wb_o[`R_CSR_ADDR]),
+						   .csr_data_i(),
 						   .e_illegal_inst_i(mem_wb_o[`R_E_ILLEGAL_INST]),
 						   .e_inst_addr_mis_i(mem_wb_o[`R_E_INST_ADDR_MIS]),
 						   .e_ld_addr_mis_i(mem_wb_o[`R_E_LD_ADDR_MIS]),

@@ -54,7 +54,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, we_exc_i, mcause_d_
     input is_csr_i;
     input we_exc_i;
     input [2:0] funct3_i;
-    input [31:0] addr_i;
+    input [11:0] addr_i;
     input [31:0] data_i;
     input [31:0] mcause_d_i;
     input [31:0] mepc_d_i;
@@ -64,7 +64,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, we_exc_i, mcause_d_
     output [31:0] mtvec_o;
     
    
-    reg dat;
+    reg [31:0] dat;
     reg [31:0] register[31:0]; 
 
     assign mtvec_o = register[MTVEC_REG];
@@ -74,12 +74,14 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, we_exc_i, mcause_d_
         // Read the old data before write
         data_out_o <= register[addr_i];
 
+        /* verilator lint_off CASEINCOMPLETE */
         // Save the new data in a temporary register
         case (funct3_i[1:0])
             CSRRW: dat <= data_i;
             CSRRS: dat <= register[addr_i] | data_i;
-            CSRRC: dat <= register[addr_i] & !data_i;
+            CSRRC: dat <= register[addr_i] & ~data_i;
         endcase
+        /* verilator lint_on CASEINCOMPLETE */
 
         if (rst_i) begin
     	    register[MISA_REG]       <= 0; // 1 misa		    0x301
@@ -100,6 +102,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, we_exc_i, mcause_d_
             register[MCOUNTEREN_REG] <= 0; // 16 mcounteren     0x306
         end
 
+        /* verilator lint_off CASEINCOMPLETE */
         // If it's a CSR instruction write the new data in the register
         else if (is_csr_i) begin   
             case (addr_i) 
@@ -121,6 +124,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, we_exc_i, mcause_d_
                 MCOUNTEREN_ADDR : register[MCOUNTEREN_REG] <= dat; // 16 mcounteren         0x306
                 default;
             endcase 
+            /* verilator lint_on CASEINCOMPLETE */
         end
         // Update register with the exceptions data
         if (we_exc_i) begin

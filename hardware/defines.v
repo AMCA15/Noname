@@ -7,23 +7,23 @@
 
 //----------------------   MEM/WB  ------------------------------
 
-`define R_MEM_DATA_O      291:260
-`define R_E_LD_ADDR_MIS   259
-`define R_E_ST_ADDR_MIS   258
+`define R_MEM_DATA_O      271:240
+`define R_E_LD_ADDR_MIS   239
+`define R_E_ST_ADDR_MIS   238
 
 //----------------------   EXE/MEM  -----------------------------
 
-`define R_E_INST_ADDR_MIS 257
-`define R_ALU_OUT         256:225
+`define R_E_INST_ADDR_MIS 237
+`define R_ALU_OUT         236:205
 
 
 //----------------------   ID/EXE  ------------------------------
-`define R_FUNCT3          224:222
-`define R_RS1             221:217
-`define R_RS2             216:212
-`define R_RD              211:207
-`define R_ALU_OP          206:203
-`define R_CSR_ADDR        202:171
+`define R_FUNCT3          204:202
+`define R_RS1             201:197
+`define R_RS2             196:192
+`define R_RD              191:187
+`define R_ALU_OP          186:183
+`define R_CSR_ADDR        182:171
 `define R_DAT_A           170:139
 `define R_DAT_B           138:107
 `define R_IMM_OUT         106:75

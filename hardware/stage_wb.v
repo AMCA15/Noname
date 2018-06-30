@@ -3,7 +3,7 @@
 * Anderson Contreras
 */
 
-module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, mem_addr_i, csr_addr_i, 
+module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, mem_addr_i, csr_addr_i, csr_data_i,
                  e_illegal_inst_i, e_inst_addr_mis_i, e_ld_addr_mis_i, e_st_addr_mis_i, rd_o, rf_wd_o, we_rf_o, mtvec_o,
                  is_exc_taken_o);
 
@@ -23,7 +23,8 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     input [31:0] alu_d_i;
     input [31:0] mem_d_i;
     input [31:0] mem_addr_i;
-    input [31:0] csr_addr_i;
+    input [11:0] csr_addr_i;
+    input [31:0] csr_data_i;
     input e_illegal_inst_i;
     input e_inst_addr_mis_i;
     input e_ld_addr_mis_i;
@@ -43,6 +44,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
 
     csr wb_csr (.clk_i(clk_i),
                 .rst_i(rst_i),
+                .funct3_i(funct3_i),
                 .addr_i(csr_addr_i),
                 .data_i(csr_data_i),
                 .is_csr_i(is_csr),
@@ -57,12 +59,14 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
 
     // Exception encoder
     always @(*) begin
+        /* verilator lint_off CASEINCOMPLETE */
         case(1'b1)
             e_illegal_inst_i:  mcause = 2;
             e_inst_addr_mis_i: mcause = 0;
             e_ld_addr_mis_i:   mcause = 4;
             e_st_addr_mis_i:   mcause = 06;
         endcase  
+        /* verilator lint_on CASEINCOMPLETE */
         is_exc_taken_o = e_ld_addr_mis_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
     end
 
@@ -72,17 +76,17 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     // Write-Back Mux
     always @(*) begin
 
-        is_csr = funct3_i ? 1 : 0;
-        
+        is_csr = |funct3_i ? 1 : 0;
+        /* verilator lint_off CASEINCOMPLETE */
         case (opcode)
             OP:                   rf_wd_o = alu_d_i;
             LOAD:                 rf_wd_o = mem_d_i;
-            SYSTEM: begin              if(is_csr) 
-                                            rf_wd_o = csr_out;
-                    end
+            SYSTEM:    if(is_csr) rf_wd_o = csr_out;
             JAL:                  rf_wd_o = pc_i + 3'b100;
             JALR:                 rf_wd_o = pc_i + 3'b100;
         endcase
+        /* verilator lint_on CASEINCOMPLETE */
+
         // Check if we need/can write to the registers
         we_rf_o = (((OP || LOAD || (SYSTEM && is_csr))) && !is_exc_taken_o) ? 1 : 0;
     end

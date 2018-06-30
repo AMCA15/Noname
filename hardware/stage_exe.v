@@ -3,12 +3,9 @@
 * Anderson Contreras
 */
 
-module stage_exe(clk_i, rst_i, pc_i, imm_i, dat_a_i, dat_b_i, alu_op_i, funct3_i,
+module stage_exe(pc_i, imm_i, dat_a_i, dat_b_i, alu_op_i, funct3_i,
 				 is_jal_inst_i, is_jalr_inst_i, is_br_inst_i,
 				 is_br_j_taken_o, e_inst_addr_mis_o, br_j_addr_o, alu_out_o);
-
-	input clk_i;
-    input rst_i;
 
 	input [31:0] pc_i;
 	input [31:0] imm_i;
@@ -36,9 +33,7 @@ module stage_exe(clk_i, rst_i, pc_i, imm_i, dat_a_i, dat_b_i, alu_op_i, funct3_i
 	assign is_br_j_taken_o = ((branch_res & is_br_inst_i) | is_jal_inst_i | is_jalr_inst_i) & !e_inst_addr_mis_o;
 
 
-	alu exe_alu (.clk_i(clk_i),
-			  	 .rst_i(rst_i),
-			  	 .in0_i(dat_a_i),
+	alu exe_alu (.in0_i(dat_a_i),
 			  	 .in1_i(dat_b_i),
 			  	 .op_i(alu_op_i),
 			  	 .equ_o(alu_equ),
@@ -46,9 +41,7 @@ module stage_exe(clk_i, rst_i, pc_i, imm_i, dat_a_i, dat_b_i, alu_op_i, funct3_i
 			  	 .ltu_o(alu_ltu),
 			  	 .out_o(alu_out_o));
 
-	branch_unit exe_branch_unit (.clk_i(clk_i),
-							     .rst_i(rst_i),
-                                 .branch_op_i(funct3_i),
+	branch_unit exe_branch_unit (.branch_op_i(funct3_i),
                                  .equ_i(alu_equ),
                                  .lt_i(alu_lt),
                                  .ltu_i(alu_ltu),

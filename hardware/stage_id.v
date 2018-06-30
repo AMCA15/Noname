@@ -3,7 +3,7 @@
 * Anderson Contreras
 */
 
-module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, is_fwd_b_i, dat_fwd_a_i, dat_fwd_b_i,
+module stage_id(clk_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, is_fwd_b_i, dat_fwd_a_i, dat_fwd_b_i,
                 funct3_o, rs1_o, rs2_o, rd_o, alu_op_o, csr_addr_o, dat_a_o, dat_b_o, imm_out_o, is_op_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
                 is_ld_mem_o, is_st_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);
     
@@ -14,7 +14,6 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
     localparam SEL_ZERO = 2'b11;
     
     input clk_i;
-    input rst_i;
 
     input [31:0] instruction_i;
     input [31:0] pc_i;
@@ -49,18 +48,16 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
     
     wire [2:0]  imm_op;
     wire [31:0] imm_out;
-    wire [2:0]  sel_dat_a;
-    wire [2:0]  sel_dat_b;
+    wire [1:0]  sel_dat_a;
+    wire [1:0]  sel_dat_b;
     wire [31:0] rs1_d, rs2_d;
 
 
     assign imm_out_o = imm_out;
 
 
-    decoder id_decoder(.clk_i(clk_i),
-                       .rst_i(rst_i),
-                       .instruction_i(instruction_i),
-                       .funct3_o(funct3),
+    decoder id_decoder(.instruction_i(instruction_i),
+                       .funct3_o(funct3_o),
                        .rs1_o(rs1_o),
                        .rs2_o(rs2_o),
                        .rd_o(rd_o),
@@ -82,7 +79,6 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
                        .e_illegal_inst_o(e_illegal_inst_o));
 
     reg_file id_reg_file(.clk_i(clk_i),
-                         .rst_i(rst_i),
                          .rs1_i(rs1_o),
                          .rs2_i(rs2_o),
                          .rd_i(rd_i),
@@ -91,15 +87,13 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
                          .rs1_d_o(rs1_d),
                          .rs2_d_o(rs2_d));
 
-    imm_gen id_imm_gen(.clk_i(clk_i),
-                       .rst_i(rst_i),
-                       .instruction_i(instruction_i),
+    imm_gen id_imm_gen(.instruction_i(instruction_i),
                        .imm_op_i(imm_op),
                        .imm_o(imm_out));
 
 
     always @(*) begin
-        
+        /* verilator lint_off CASEINCOMPLETE */
         // Mux for ALU inputs
         case (sel_dat_a)
             SEL_REG:  dat_a_o = is_fwd_a_i ? dat_fwd_a_i : rs1_d;
@@ -114,6 +108,6 @@ module stage_id(clk_i, rst_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fw
             SEL_PC:   dat_b_o = pc_i;
             SEL_ZERO: dat_b_o = 0;
         endcase
-
+        /* verilator lint_on CASEINCOMPLETE */
     end
 endmodule

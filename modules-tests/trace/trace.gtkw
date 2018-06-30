@@ -1,14 +1,14 @@
 [*]
 [*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
-[*] Wed Jun 27 16:31:54 2018
+[*] Sat Jun 30 14:56:24 2018
 [*]
 [dumpfile] "..\..\build\vcd\trace.vcd"
 [dumpfile_mtime] "Wed Jun 27 15:14:14 2018"
 [dumpfile_size] 1763896
 [timestart] 5
 [size] 1366 705
-[pos] -35 -35
-*-7.000000 83 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -1 -1
+*-5.000000 126 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.top.
 [treeopen] TOP.top.cpu.
@@ -161,13 +161,12 @@ TOP.top.cpu.if_id_o[63:0]
 @1401200
 -group_end
 @22
-[color] 4
-TOP.top.cpu.id_exe_i[224:0]
-TOP.top.cpu.id_exe_o[224:0]
-TOP.top.cpu.exe_mem_i[257:0]
-TOP.top.cpu.exe_mem_o[257:0]
-TOP.top.cpu.mem_wb_i[291:0]
-TOP.top.cpu.mem_wb_o[291:0]
+TOP.top.cpu.id_exe_i[204:0]
+TOP.top.cpu.id_exe_o[204:0]
+TOP.top.cpu.exe_mem_i[237:0]
+TOP.top.cpu.exe_mem_o[237:0]
+TOP.top.cpu.mem_wb_i[271:0]
+TOP.top.cpu.mem_wb_o[271:0]
 @200
 -
 -Stage IF
@@ -187,17 +186,15 @@ TOP.top.cpu.core_stage_if.wbm_cyc_o
 TOP.top.cpu.core_stage_if.wbm_stb_o
 TOP.top.cpu.core_stage_if.wbm_ack_i
 @22
-TOP.top.cpu.core_stage_if.pc_o[31:0]
-@23
 [color] 4
 TOP.top.cpu.core_stage_if.pc_o[31:0]
-@22
 TOP.top.cpu.core_stage_if.instruction_o[31:0]
 TOP.top.cpu.core_stage_if.exception_addr_i[31:0]
 @28
 TOP.top.cpu.core_stage_if.sel_addr_i[1:0]
-@22
+@23
 TOP.top.cpu.core_stage_if.br_j_addr_i[31:0]
+@22
 TOP.top.cpu.core_stage_if.exception_addr_i[31:0]
 @28
 TOP.top.cpu.core_stage_if.stall_i
@@ -209,7 +206,6 @@ TOP.top.cpu.if_id_flush
 TOP.clk_i
 TOP.top.rst_i
 @22
-TOP.top.cpu.id_exe_o[224:0]
 TOP.top.cpu.core_stage_id.pc_i[31:0]
 TOP.top.cpu.core_stage_id.instruction_i[31:0]
 @28
@@ -243,12 +239,110 @@ TOP.top.cpu.id_exe_flush
 @28
 TOP.top.clk_i
 TOP.rst_i
+@22
+TOP.top.cpu.core_stage_exe.pc_i[31:0]
+TOP.top.cpu.core_stage_exe.imm_i[31:0]
+@28
+TOP.top.cpu.core_stage_exe.funct3_i[2:0]
+@c00022
+TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+@28
+(0)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(1)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(2)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(3)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(4)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(5)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(6)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(7)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(8)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(9)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(10)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(11)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(12)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(13)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(14)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(15)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(16)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(17)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(18)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(19)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(20)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(21)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(22)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(23)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(24)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(25)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(26)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(27)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(28)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(29)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(30)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+(31)TOP.top.cpu.core_stage_exe.dat_a_i[31:0]
+@1401200
+-group_end
+@22
+TOP.top.cpu.core_stage_exe.dat_b_i[31:0]
+TOP.top.cpu.core_stage_exe.alu_out_o[31:0]
+@28
+TOP.top.cpu.core_stage_exe.branch_res
+TOP.top.cpu.core_stage_exe.is_br_j_taken_o
+TOP.top.cpu.core_stage_exe.is_br_inst_i
+TOP.top.cpu.core_stage_exe.is_jal_inst_i
+TOP.top.cpu.core_stage_exe.is_jalr_inst_i
+@c00022
+TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+@28
+(0)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(1)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(2)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(3)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(4)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(5)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(6)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(7)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(8)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(9)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(10)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(11)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(12)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(13)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(14)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(15)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(16)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(17)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(18)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(19)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(20)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(21)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(22)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(23)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(24)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(25)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(26)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(27)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(28)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(29)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(30)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+(31)TOP.top.cpu.core_stage_exe.br_j_addr_o[31:0]
+@1401200
+-group_end
 @200
 -
 -Stage MEM
 @28
+TOP.top.cpu.core_stage_mem.funct3_i[2:0]
 TOP.top.cpu.exe_mem_stall
 TOP.top.cpu.exe_mem_flush
+@22
+TOP.top.cpu.core_stage_mem.mem_addr_i[31:0]
+TOP.top.cpu.core_stage_mem.mem_data_i[31:0]
+TOP.top.cpu.core_stage_mem.mem_data_o[31:0]
+TOP.top.cpu.core_stage_mem.st_sel[3:0]
+@28
+TOP.top.cpu.core_stage_mem.is_st_mem_i
+TOP.top.cpu.core_stage_mem.is_ld_mem_i
+TOP.top.cpu.core_stage_exe.e_inst_addr_mis_o
 @200
 -
 -Stage WB

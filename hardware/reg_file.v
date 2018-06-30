@@ -3,12 +3,9 @@
 * Anderson Contreras
 */
 
-//Currently the clk_i and rst_i are only for simulation purposes
-
-module reg_file(clk_i, rst_i, rs1_i, rs2_i, rd_i, rf_wd_i, we_i, rs1_d_o, rs2_d_o);
+module reg_file(clk_i, rs1_i, rs2_i, rd_i, rf_wd_i, we_i, rs1_d_o, rs2_d_o);
 
   input clk_i;
-  input rst_i;
 
   input we_i;
   input  [4:0]  rs1_i, rs2_i, rd_i;

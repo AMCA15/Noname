@@ -26,24 +26,22 @@ module stage_mem(clk_i, rst_i, is_ld_mem_i, is_st_mem_i, funct3_i, mem_data_i, m
     output wbm_cyc_o;
     output wbm_stb_o;
     output wbm_we_o;
-    output [2:0]  wbm_sel_o;
+    output [3:0]  wbm_sel_o;
     output [31:0] wbm_dat_o;
     output [31:0] wbm_addr_o;
 
 
     wire kill;
-    wire [2:0]  st_sel;
+    wire [3:0]  st_sel;
     wire [31:0] ld_data_fmt;
 
     assign wbm_addr_o = mem_addr_i;
     assign wbm_we_o   = is_st_mem_i;
     assign wbm_sel_o  = st_sel;
-    assign kill = e_ld_addr_mis_o || e_st_addr_mis_o;
+    assign kill = e_ld_addr_mis_o || e_st_addr_mis_o || rst_i;
 
 
-    lsu_comb exe_lsu_comb (.clk_i(clk_i),
-                           .rst_i(rst_i),
-                           .funct3_i(funct3_i),
+    lsu_comb exe_lsu_comb (.funct3_i(funct3_i),
                            .st_data_i(mem_data_i),
                            .ld_data_i(wbm_dat_i),
                            .addr_i(mem_addr_i),
