@@ -59,11 +59,11 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	// 						       ID/EXE
 	wire id_exe_stall;
 	wire id_exe_flush = is_br_j_taken | is_exc_taken;
-	wire [204:0] id_exe_i = {id_exe_funct3_i, id_exe_rs1_i, id_exe_rs2_i, id_exe_rd_i, id_exe_alu_op_i,
+	wire [268:0] id_exe_i = {id_exe_funct3_i, id_exe_rs1_i, id_exe_rs2_i, id_exe_rd_i, id_exe_alu_op_i,
  							 id_exe_csr_addr_i, id_exe_dat_a_i, id_exe_dat_b_i, id_exe_imm_out_i, id_exe_is_op_i, id_exe_is_lui_i, id_exe_is_auipc_i,
  							 id_exe_is_jal_i, id_exe_is_jalr_i, id_exe_is_branch_i, id_exe_is_ld_mem_i, id_exe_is_st_mem_i,
  							 id_exe_is_misc_mem_i, id_exe_is_system_i, id_exe_e_illegal_inst_i, if_id_o};
-	reg  [204:0] id_exe_o;
+	reg  [268:0] id_exe_o;
 
 
 	// Signals
@@ -71,6 +71,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	wire [4:0] id_exe_rs1_i;
 	wire [4:0] id_exe_rs2_i;
 	wire [4:0] id_exe_rd_i;
+	wire [31:0] id_exe_rs1_dat_i;
+	wire [31:0] id_exe_rs2_dat_i;
 	wire [3:0] id_exe_alu_op_i;
 	wire [31:0] id_exe_csr_addr_i;
 	wire [31:0] id_exe_dat_a_i;
@@ -92,8 +94,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	// 						      EXE/MEM
 	wire exe_mem_stall;
 	wire exe_mem_flush = is_exc_taken;
-	wire [237:0] exe_mem_i = {exe_mem_e_inst_addr_mis_o, exe_mem_alu_out_i, id_exe_o};
-	reg  [237:0] exe_mem_o;
+	wire [301:0] exe_mem_i = {exe_mem_e_inst_addr_mis_o, exe_mem_alu_out_i, id_exe_o};
+	reg  [301:0] exe_mem_o;
 
 	// Signals
 	wire exe_mem_e_inst_addr_mis_o;
@@ -104,8 +106,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	// 						      MEM/WB
 	wire mem_wb_stall;
 	wire mem_wb_flush = is_exc_taken;
-	wire [271:0] mem_wb_i = {mem_wb_mem_data_i, mem_wb_e_ld_addr_mis_i, mem_wb_e_st_addr_mis_i, exe_mem_o};
-	reg  [271:0] mem_wb_o;
+	wire [335:0] mem_wb_i = {mem_wb_mem_data_i, mem_wb_e_ld_addr_mis_i, mem_wb_e_st_addr_mis_i, exe_mem_o};
+	reg  [335:0] mem_wb_o;
 
 	// Signals
 	wire [31:0] mem_wb_mem_data_i;
@@ -115,7 +117,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	//---------------------------------------------------------------
 
 	// Register behaviors
-	always @(negedge clk_i) begin
+	always @(posedge clk_i) begin
 		if_id_o   <= (rst_i || if_id_flush)   ? `NOP : (if_id_stall)   ? if_id_o   : if_id_i;
 		id_exe_o  <= (rst_i || id_exe_flush)  ? `NOP : (id_exe_stall)  ? id_exe_o  : id_exe_i;
 		exe_mem_o <= (rst_i || exe_mem_flush) ? `NOP : (exe_mem_stall) ? exe_mem_o : exe_mem_i;
@@ -218,6 +220,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 						   .rs1_o(id_exe_i[`R_RS1]),
 						   .rs2_o(id_exe_i[`R_RS2]),
 						   .rd_o(id_exe_rd_i),
+						   .rs2_dat_o(id_exe_i[`R_RS1_DAT]),
+						   .rs1_dat_o(id_exe_i[`R_RS2_DAT]),
 						   .alu_op_o(id_exe_i[`R_ALU_OP]),
 						   .csr_addr_o(id_exe_i[`R_CSR_ADDR]),
 						   .dat_a_o(id_exe_i[`R_DAT_A]),
@@ -261,8 +265,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 							 .is_ld_mem_i(exe_mem_o[`R_IS_LD_MEM]),
 							 .is_st_mem_i(exe_mem_o[`R_IS_ST_MEM]),
 							 .funct3_i(exe_mem_o[`R_FUNCT3]),
-							 .mem_data_i(exe_mem_o[`R_ALU_OUT]),
-							 .mem_addr_i(),
+							 .mem_data_i(exe_mem_o[`R_RS2_DAT]),
+							 .mem_addr_i(exe_mem_o[`R_ALU_OUT]),
 							 .mem_data_o(mem_wb_i[`R_MEM_DATA_O]),
 							 .wbm_dat_i(dwbm_dat_i),
 							 .wbm_ack_i(dwbm_ack_i),
@@ -286,9 +290,12 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 						   .funct3_i(mem_wb_o[`R_FUNCT3]),
 						   .alu_d_i(mem_wb_o[`R_ALU_OUT]),
 						   .mem_d_i(mem_wb_o[`R_MEM_DATA_O]),
-						   .mem_addr_i(),
+						   .mem_addr_i(mem_wb_o[`R_ALU_OUT]),
 						   .csr_addr_i(mem_wb_o[`R_CSR_ADDR]),
 						   .csr_data_i(),
+						   .xint_meip_i(xint_meip_i),
+						   .xint_mtip_i(xint_mtip_i),
+						   .xint_msip_i(xint_msip_i),
 						   .e_illegal_inst_i(mem_wb_o[`R_E_ILLEGAL_INST]),
 						   .e_inst_addr_mis_i(mem_wb_o[`R_E_INST_ADDR_MIS]),
 						   .e_ld_addr_mis_i(mem_wb_o[`R_E_LD_ADDR_MIS]),

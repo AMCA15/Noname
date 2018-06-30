@@ -4,8 +4,8 @@
 */
 
 module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, mem_addr_i, csr_addr_i, csr_data_i,
-                 e_illegal_inst_i, e_inst_addr_mis_i, e_ld_addr_mis_i, e_st_addr_mis_i, rd_o, rf_wd_o, we_rf_o, mtvec_o,
-                 is_exc_taken_o);
+                 xint_meip_i, xint_mtip_i, xint_msip_i, e_illegal_inst_i, e_inst_addr_mis_i, e_ld_addr_mis_i, e_st_addr_mis_i,
+                 rd_o, rf_wd_o, we_rf_o, mtvec_o, is_exc_taken_o);
 
     // Opcodes used for wb
     localparam OP       = 7'b0110011;
@@ -25,6 +25,9 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     input [31:0] mem_addr_i;
     input [11:0] csr_addr_i;
     input [31:0] csr_data_i;
+    input xint_meip_i;
+    input xint_mtip_i;
+    input xint_msip_i;
     input e_illegal_inst_i;
     input e_inst_addr_mis_i;
     input e_ld_addr_mis_i;

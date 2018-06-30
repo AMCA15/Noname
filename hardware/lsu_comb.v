@@ -28,8 +28,9 @@ module lsu_comb(funct3_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o, ld_data_f
 	output e_st_addr_mis_o;
 
 
+	/* verilator lint_off CASEINCOMPLETE */
+	/* verilator lint_off WIDTH */
 	always @(*) begin
-		/* verilator lint_off CASEINCOMPLETE */
 		case (funct3_i)
 			LB:  begin
                 case (addr_i[1:0])
@@ -66,11 +67,9 @@ module lsu_comb(funct3_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o, ld_data_f
 				ld_data_fmt_o = ld_data_i;
 			end
 		endcase
-		/* verilator lint_on CASEINCOMPLETE */
 	end
 
 	always @(*) begin
-		/* verilator lint_off CASEINCOMPLETE */
 		case (funct3_i)
 			SB: begin
         	    st_data_fmt_o = {4{st_data_i[7:0]}};
@@ -87,6 +86,7 @@ module lsu_comb(funct3_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o, ld_data_f
         	    st_sel_o = 4'b1111;
 			end
 		endcase
-		/* verilator lint_on CASEINCOMPLETE */
 	end
+	/* verilator lint_on CASEINCOMPLETE */
+	/* verilator lint_on WIDTH */
 endmodule

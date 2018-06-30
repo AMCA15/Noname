@@ -25,8 +25,9 @@ module imm_gen(instruction_i, imm_op_i, imm_o);
   wire [31:0] imm_u;
   wire [31:0] imm_j;
   wire [31:0] imm_c;
-  wire [4:0]  imm_sh;
+  wire [31:0] imm_sh;
 
+	/* verilator lint_off WIDTH */
   assign imm_i = $signed(instruction_i[31:20]);
   assign imm_s = $signed({instruction_i[31:25], instruction_i[11:7]});
   assign imm_b = $signed({instruction_i[31], instruction_i[7], instruction_i[30:25], instruction_i[11:8], 1'b0});
@@ -37,13 +38,14 @@ module imm_gen(instruction_i, imm_op_i, imm_o);
 
   always @(*) begin
     case (imm_op_i)
-      IMM_I: imm_o = imm_i; 
-      IMM_S: imm_o = imm_s; 
-      IMM_B: imm_o = imm_b; 
-      IMM_U: imm_o = imm_u; 
-      IMM_J: imm_o = imm_j; 
-      IMM_C: imm_o = imm_c; 
+      IMM_I:  imm_o = imm_i; 
+      IMM_S:  imm_o = imm_s; 
+      IMM_B:  imm_o = imm_b; 
+      IMM_U:  imm_o = imm_u; 
+      IMM_J:  imm_o = imm_j; 
+      IMM_C:  imm_o = imm_c; 
       IMM_SH: imm_o = imm_sh;
     endcase    
+	/* verilator lint_on WIDTH */
   end
 endmodule
