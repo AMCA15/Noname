@@ -39,10 +39,10 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     output [31:0] mtvec_o;
     output is_exc_taken_o;
 
-    wire is_csr;
-    wire [31:0] mcause; 
+    wire opcode = instruction_i[6:0];
+    wire is_csr = (opcode == SYSTEM) && |funct3_i; 
 
-    reg [31:0] mstatus, mtval, csr_out;
+    reg [31:0] mcause, mstatus, mtval, csr_out;
 
 
     csr wb_csr (.clk_i(clk_i),
@@ -61,37 +61,46 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     
 
     // Exception encoder
-    always @(*) begin
+    always @(posedge clk_i) begin
         /* verilator lint_off CASEINCOMPLETE */
         case(1'b1)
-            e_illegal_inst_i:  mcause = 2;
-            e_inst_addr_mis_i: mcause = 0;
-            e_ld_addr_mis_i:   mcause = 4;
-            e_st_addr_mis_i:   mcause = 06;
+            e_illegal_inst_i: begin
+                mcause <= 2;
+                mtval  <= instruction_i;
+            end
+            e_inst_addr_mis_i: begin
+                mcause <= 0;
+                mtval  <= instruction_i;
+            end
+            e_ld_addr_mis_i: begin   
+                mcause <= 4;
+                mtval  <= mem_addr_i;
+            end
+            e_st_addr_mis_i: begin
+                mcause <= 06;
+                mtval  <= mem_addr_i;
+            end
         endcase  
+
         /* verilator lint_on CASEINCOMPLETE */
-        is_exc_taken_o = e_ld_addr_mis_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
+        is_exc_taken_o <= e_ld_addr_mis_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
     end
 
-    wire [6:0] opcode;
-    assign opcode = instruction_i[6:0];
        
     // Write-Back Mux
-    always @(*) begin
-
-        is_csr = |funct3_i ? 1 : 0;
+    always @(posedge clk_i) begin
         /* verilator lint_off CASEINCOMPLETE */
         case (opcode)
-            OP:                   rf_wd_o = alu_d_i;
-            LOAD:                 rf_wd_o = mem_d_i;
-            SYSTEM:    if(is_csr) rf_wd_o = csr_out;
-            JAL:                  rf_wd_o = pc_i + 3'b100;
-            JALR:                 rf_wd_o = pc_i + 3'b100;
+            OP:                   rf_wd_o <= alu_d_i;
+            LOAD:                 rf_wd_o <= mem_d_i;
+            SYSTEM:    if(is_csr) rf_wd_o <= csr_out;
+            JAL:                  rf_wd_o <= pc_i + 3'b100;
+            JALR:                 rf_wd_o <= pc_i + 3'b100;
         endcase
         /* verilator lint_on CASEINCOMPLETE */
 
         // Check if we need/can write to the registers
-        we_rf_o = (((OP || LOAD || (SYSTEM && is_csr))) && !is_exc_taken_o) ? 1 : 0;
+        we_rf_o <= (((OP || LOAD || (SYSTEM && is_csr))) && !is_exc_taken_o) ? 1 : 0;
     end
 
 endmodule
