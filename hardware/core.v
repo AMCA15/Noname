@@ -47,7 +47,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	//---------------------------------------------------------------
 	// 						       IF/ID
 	wire if_id_stall ;
-	wire if_id_flush = is_br_j_taken || is_exc_taken;
+	wire if_id_flush = is_br_j_taken || is_exc_taken || (iwbm_cyc_o && !id_exe_stall);
 	wire [63:0] if_id_i = {if_id_pc_i, if_id_instruction_i};
 	reg  [63:0] if_id_o;
 	
@@ -59,7 +59,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	// 						       ID/EXE
 	wire id_exe_stall;
 	wire id_exe_flush = is_br_j_taken | is_exc_taken;
-	wire [268:0] id_exe_i = {id_exe_funct3_i, id_exe_rs1_i, id_exe_rs2_i, id_exe_rd_i, id_exe_alu_op_i,
+	wire [268:0] id_exe_i = {id_exe_funct3_i, id_exe_rs1_i, id_exe_rs2_i, id_exe_rd_i, id_exe_rs1_dat_i, id_exe_rs2_dat_i, id_exe_alu_op_i,
  							 id_exe_csr_addr_i, id_exe_dat_a_i, id_exe_dat_b_i, id_exe_imm_out_i, id_exe_is_op_i, id_exe_is_lui_i, id_exe_is_auipc_i,
  							 id_exe_is_jal_i, id_exe_is_jalr_i, id_exe_is_branch_i, id_exe_is_ld_mem_i, id_exe_is_st_mem_i,
  							 id_exe_is_misc_mem_i, id_exe_is_system_i, id_exe_e_illegal_inst_i, if_id_o};
@@ -74,12 +74,12 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	wire [31:0] id_exe_rs1_dat_i;
 	wire [31:0] id_exe_rs2_dat_i;
 	wire [3:0] id_exe_alu_op_i;
-	wire [31:0] id_exe_csr_addr_i;
+	wire [11:0] id_exe_csr_addr_i;
 	wire [31:0] id_exe_dat_a_i;
 	wire [31:0] id_exe_dat_b_i;
 	wire [31:0] id_exe_imm_out_i;
 	wire id_exe_is_op_i;
-	wire id_exe_is_lui_i;
+	wire id_exe_is_lui_i;	
 	wire id_exe_is_auipc_i;
 	wire id_exe_is_jal_i;
 	wire id_exe_is_jalr_i;
@@ -289,7 +289,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 						   .mem_d_i(mem_wb_o[`R_MEM_DATA_O]),
 						   .mem_addr_i(mem_wb_o[`R_ALU_OUT]),
 						   .csr_addr_i(mem_wb_o[`R_CSR_ADDR]),
-						   .csr_data_i(),
+						   .csr_data_i(mem_wb_o[`R_ALU_OUT]),
 						   .xint_meip_i(xint_meip_i),
 						   .xint_mtip_i(xint_mtip_i),
 						   .xint_msip_i(xint_msip_i),

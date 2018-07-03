@@ -9,6 +9,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
 
     // Opcodes used for wb
     localparam OP       = 7'b0110011;
+    localparam OPI      = 7'b0010011;
     localparam LOAD     = 7'b0000011;
     localparam SYSTEM   = 7'b1110011;
     localparam JAL      = 7'b1101111;
@@ -39,8 +40,9 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     output [31:0] mtvec_o;
     output is_exc_taken_o;
 
-    wire opcode = instruction_i[6:0];
+    wire [6:0]opcode = instruction_i[6:0];
     wire is_csr = (opcode == SYSTEM) && |funct3_i; 
+    wire rs1 = instruction_i[19:15];
 
     reg [31:0] mcause, mstatus, mtval, csr_out;
 
@@ -51,6 +53,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
                 .addr_i(csr_addr_i),
                 .data_i(csr_data_i),
                 .is_csr_i(is_csr),
+                .rs1_i(rs1),
                 .we_exc_i(is_exc_taken_o),
                 .mcause_d_i(mcause),
                 .mepc_d_i(pc_i),
@@ -90,8 +93,10 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     // Write-Back Mux
     always @(posedge clk_i) begin
         /* verilator lint_off CASEINCOMPLETE */
+            rd_o <= instruction_i[11:7];
         case (opcode)
             OP:                   rf_wd_o <= alu_d_i;
+            OPI:                  rf_wd_o <= alu_d_i;
             LOAD:                 rf_wd_o <= mem_d_i;
             SYSTEM:    if(is_csr) rf_wd_o <= csr_out;
             JAL:                  rf_wd_o <= pc_i + 3'b100;

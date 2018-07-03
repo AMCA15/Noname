@@ -29,7 +29,7 @@ module stage_exe(pc_i, imm_i, dat_a_i, dat_b_i, alu_op_i, funct3_i,
 
 
 	assign br_j_addr_o = pc_i + imm_i;
-	assign e_inst_addr_mis_o = |br_j_addr_o[1:0];
+	assign e_inst_addr_mis_o = |br_j_addr_o[1:0] && (is_br_inst_i || is_jal_inst_i || is_jalr_inst_i);
 	assign is_br_j_taken_o = ((branch_res & is_br_inst_i) | is_jal_inst_i | is_jalr_inst_i) & !e_inst_addr_mis_o;
 
 

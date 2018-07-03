@@ -3,7 +3,7 @@
 * MANUEL HURTADO
 */
 
-module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, we_exc_i, mcause_d_i, mepc_d_i, mtval_d_i,
+module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mcause_d_i, mepc_d_i, mtval_d_i,
             mstatus_d_i, data_out_o, mtvec_o);
 
     // CSR Address
@@ -35,6 +35,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, we_exc_i, mcause_d_
     input rst_i;
 
     input is_csr_i;
+    input [4:0] rs1_i;
     input we_exc_i;
     input [2:0] funct3_i;
     input [11:0] addr_i;
@@ -115,26 +116,28 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, we_exc_i, mcause_d_
                 MCOUNTEREN_ADDR : data_out_o <= mcounteren;
             endcase
 
-            case (addr_i)
-                MISA_ADDR       : misa         <= is_csrrw ? data_i : (is_csrrs ? misa       | data_i: misa       & ~data_i);
-                MVENDORID_ADDR  : mvendorid    <= is_csrrw ? data_i : (is_csrrs ? mvendorid  | data_i: mvendorid  & ~data_i);
-                MARCHID_ADDR    : marchid      <= is_csrrw ? data_i : (is_csrrs ? marchid    | data_i: marchid    & ~data_i);
-                MIMPID_ADDR     : mimpid       <= is_csrrw ? data_i : (is_csrrs ? mimpid     | data_i: mimpid     & ~data_i);
-                MHARTID_ADDR    : mhartid      <= is_csrrw ? data_i : (is_csrrs ? mhartid    | data_i: mhartid    & ~data_i);
-                MCAUSE_ADDR     : mcause       <= is_csrrw ? data_i : (is_csrrs ? mcause     | data_i: mcause     & ~data_i);
-                MCAUSE_ADDR     : mtval        <= is_csrrw ? data_i : (is_csrrs ? mtval      | data_i: mtval      & ~data_i);
-                MSTATUS_ADDR    : mstatus      <= is_csrrw ? data_i : (is_csrrs ? mstatus    | data_i: mstatus    & ~data_i);
-                MTVEC_ADDR      : mtvec        <= is_csrrw ? data_i : (is_csrrs ? mtvec      | data_i: mtvec      & ~data_i);
-                MEPC_ADDR       : mepc         <= is_csrrw ? data_i : (is_csrrs ? mepc       | data_i: mepc       & ~data_i);
-                MIP_ADDR        : mip          <= is_csrrw ? data_i : (is_csrrs ? mip        | data_i: mip        & ~data_i);
-                MIE_ADDR        : mie          <= is_csrrw ? data_i : (is_csrrs ? mie        | data_i: mie        & ~data_i);
-                MCYCLE_ADDR     : mcycle       <= is_csrrw ? data_i : (is_csrrs ? mcycle     | data_i: mcycle     & ~data_i);
-                MYCLEH_ADDR     : mycleh       <= is_csrrw ? data_i : (is_csrrs ? mycleh     | data_i: mycleh     & ~data_i);
-                MINSTRET_ADDR   : minstret     <= is_csrrw ? data_i : (is_csrrs ? minstret   | data_i: minstret   & ~data_i);
-                MINSTRETH_ADDR  : minstreth    <= is_csrrw ? data_i : (is_csrrs ? minstreth  | data_i: minstreth  & ~data_i);
-                MCOUNTEREN_ADDR : mcounteren   <= is_csrrw ? data_i : (is_csrrs ? mcounteren | data_i: mcounteren & ~data_i);
-                default;
-            endcase
+            if (((!funct3_i[2] && rs1_i) || (funct3_i[2] && data_i)) && !is_csrrw) begin
+                case (addr_i)
+                    MISA_ADDR       : misa         <= is_csrrw ? data_i : (is_csrrs ? misa       | data_i: misa       & ~data_i);
+                //  MVENDORID_ADDR  : mvendorid    <= is_csrrw ? data_i : (is_csrrs ? mvendorid  | data_i: mvendorid  & ~data_i);
+                //  MARCHID_ADDR    : marchid      <= is_csrrw ? data_i : (is_csrrs ? marchid    | data_i: marchid    & ~data_i);
+                //  MIMPID_ADDR     : mimpid       <= is_csrrw ? data_i : (is_csrrs ? mimpid     | data_i: mimpid     & ~data_i);
+                //  MHARTID_ADDR    : mhartid      <= is_csrrw ? data_i : (is_csrrs ? mhartid    | data_i: mhartid    & ~data_i);
+                    MCAUSE_ADDR     : mcause       <= is_csrrw ? data_i : (is_csrrs ? mcause     | data_i: mcause     & ~data_i);
+                    MCAUSE_ADDR     : mtval        <= is_csrrw ? data_i : (is_csrrs ? mtval      | data_i: mtval      & ~data_i);
+                    MSTATUS_ADDR    : mstatus      <= is_csrrw ? data_i : (is_csrrs ? mstatus    | data_i: mstatus    & ~data_i);
+                    MTVEC_ADDR      : mtvec        <= is_csrrw ? data_i : (is_csrrs ? mtvec      | data_i: mtvec      & ~data_i);
+                    MEPC_ADDR       : mepc         <= is_csrrw ? data_i : (is_csrrs ? mepc       | data_i: mepc       & ~data_i);
+                    MIP_ADDR        : mip          <= is_csrrw ? data_i : (is_csrrs ? mip        | data_i: mip        & ~data_i);
+                    MIE_ADDR        : mie          <= is_csrrw ? data_i : (is_csrrs ? mie        | data_i: mie        & ~data_i);
+                    MCYCLE_ADDR     : mcycle       <= is_csrrw ? data_i : (is_csrrs ? mcycle     | data_i: mcycle     & ~data_i);
+                    MYCLEH_ADDR     : mycleh       <= is_csrrw ? data_i : (is_csrrs ? mycleh     | data_i: mycleh     & ~data_i);
+                    MINSTRET_ADDR   : minstret     <= is_csrrw ? data_i : (is_csrrs ? minstret   | data_i: minstret   & ~data_i);
+                    MINSTRETH_ADDR  : minstreth    <= is_csrrw ? data_i : (is_csrrs ? minstreth  | data_i: minstreth  & ~data_i);
+                    MCOUNTEREN_ADDR : mcounteren   <= is_csrrw ? data_i : (is_csrrs ? mcounteren | data_i: mcounteren & ~data_i);
+                    default;
+                endcase
+            end
             /* verilator lint_on CASEINCOMPLETE */
         end
         // Update register with the exceptions data
