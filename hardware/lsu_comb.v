@@ -4,7 +4,7 @@
 * Luis Ruiz
 */
 
-module lsu_comb(funct3_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o, ld_data_fmt_o, st_sel_o,
+module lsu_comb(funct3_i, is_mem_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o, ld_data_fmt_o, st_sel_o,
                 e_ld_addr_mis_o, e_st_addr_mis_o);
 
 	localparam LB  = 3'b000;
@@ -18,6 +18,7 @@ module lsu_comb(funct3_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o, ld_data_f
 
 
 	input [2:0]   funct3_i;
+	input		  is_mem_i;
 	input [31:0]  st_data_i;
 	input [31:0]  ld_data_i;
 	input [31:0]  addr_i;
@@ -31,61 +32,66 @@ module lsu_comb(funct3_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o, ld_data_f
 	/* verilator lint_off CASEINCOMPLETE */
 	/* verilator lint_off WIDTH */
 	always @(*) begin
-		case (funct3_i)
-			LB:  begin
-                case (addr_i[1:0])
-                    2'b00: ld_data_fmt_o = $signed(ld_data_i[7:0]);
-                    2'b01: ld_data_fmt_o = $signed(ld_data_i[15:8]);
-                    2'b10: ld_data_fmt_o = $signed(ld_data_i[23:16]);
-                    2'b11: ld_data_fmt_o = $signed(ld_data_i[31:24]);
-                endcase
-			end
-			LBU: begin
-                case (addr_i[1:0])
-                    2'b00: ld_data_fmt_o = ld_data_i[7:0];
-                    2'b01: ld_data_fmt_o = ld_data_i[15:8];
-                    2'b10: ld_data_fmt_o = ld_data_i[23:16];
-                    2'b11: ld_data_fmt_o = ld_data_i[31:24];
-                endcase
-			end
-			LH:  begin
-				e_ld_addr_mis_o = addr_i[0] ? 1 : 0;
-                case (addr_i[1])
-                    1'b0: ld_data_fmt_o = $signed(ld_data_i[15:0]);
-                    1'b1: ld_data_fmt_o = $signed(ld_data_i[31:16]);
-                endcase
-			end
-			LHU: begin
-				e_ld_addr_mis_o = addr_i[0] ? 1 : 0;
-                case (addr_i[1])
-                    1'b0: ld_data_fmt_o = ld_data_i[15:0];
-                    1'b1: ld_data_fmt_o = ld_data_i[31:16];
-                endcase
-			end
-			LW:  begin
-				e_ld_addr_mis_o = |addr_i[1:0] ? 1 : 0;
-				ld_data_fmt_o = ld_data_i;
-			end
-		endcase
+		if(is_mem_i) begin
+			case (funct3_i)
+				LB:  begin
+	                case (addr_i[1:0])
+	                    2'b00: ld_data_fmt_o = $signed(ld_data_i[7:0]);
+	                    2'b01: ld_data_fmt_o = $signed(ld_data_i[15:8]);
+	                    2'b10: ld_data_fmt_o = $signed(ld_data_i[23:16]);
+	                    2'b11: ld_data_fmt_o = $signed(ld_data_i[31:24]);
+	                endcase
+				end
+				LBU: begin
+	                case (addr_i[1:0])
+	                    2'b00: ld_data_fmt_o = ld_data_i[7:0];
+	                    2'b01: ld_data_fmt_o = ld_data_i[15:8];
+	                    2'b10: ld_data_fmt_o = ld_data_i[23:16];
+	                    2'b11: ld_data_fmt_o = ld_data_i[31:24];
+	                endcase
+				end
+				LH:  begin
+					e_ld_addr_mis_o = addr_i[0] ? 1 : 0;
+	                case (addr_i[1])
+	                    1'b0: ld_data_fmt_o = $signed(ld_data_i[15:0]);
+	                    1'b1: ld_data_fmt_o = $signed(ld_data_i[31:16]);
+	                endcase
+				end
+				LHU: begin
+					e_ld_addr_mis_o = addr_i[0] ? 1 : 0;
+	                case (addr_i[1])
+	                    1'b0: ld_data_fmt_o = ld_data_i[15:0];
+	                    1'b1: ld_data_fmt_o = ld_data_i[31:16];
+	                endcase
+				end
+				LW:  begin
+					e_ld_addr_mis_o = |addr_i[1:0] ? 1 : 0;
+					ld_data_fmt_o = ld_data_i;
+				end
+			endcase
+		end		
 	end
 
+
 	always @(*) begin
-		case (funct3_i)
-			SB: begin
-        	    st_data_fmt_o = {4{st_data_i[7:0]}};
-        	    st_sel_o = 4'b0001 << addr_i[1:0];
-			end
-			SH: begin
-				e_st_addr_mis_o = addr_i[0] ? 1 : 0;
-        	    st_data_fmt_o = {2{st_data_i[15:0]}};
-        	    st_sel_o = addr_i[1] ? 4'b1100 : 4'b0011;
-			end
-			SW: begin
-				e_st_addr_mis_o = |addr_i[1:0] ? 1 : 0;
-        	    st_data_fmt_o = st_data_i;
-        	    st_sel_o = 4'b1111;
-			end
-		endcase
+		if(is_mem_i) begin	
+			case (funct3_i)
+				SB: begin
+	        	    st_data_fmt_o = {4{st_data_i[7:0]}};
+	        	    st_sel_o = 4'b0001 << addr_i[1:0];
+				end
+				SH: begin
+					e_st_addr_mis_o = addr_i[0] ? 1 : 0;
+	        	    st_data_fmt_o = {2{st_data_i[15:0]}};
+	        	    st_sel_o = addr_i[1] ? 4'b1100 : 4'b0011;
+				end
+				SW: begin
+					e_st_addr_mis_o = |addr_i[1:0] ? 1 : 0;
+	        	    st_data_fmt_o = st_data_i;
+	        	    st_sel_o = 4'b1111;
+				end
+			endcase
+		end	
 	end
 	/* verilator lint_on CASEINCOMPLETE */
 	/* verilator lint_on WIDTH */

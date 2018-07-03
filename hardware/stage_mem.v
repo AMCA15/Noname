@@ -34,6 +34,7 @@ module stage_mem(clk_i, rst_i, is_ld_mem_i, is_st_mem_i, funct3_i, mem_data_i, m
     wire kill;
     wire [3:0]  st_sel;
     wire [31:0] ld_data_fmt;
+    wire is_mem = is_st_mem_i || is_ld_mem_i;
 
     assign wbm_addr_o = mem_addr_i;
     assign wbm_we_o   = is_st_mem_i;
@@ -42,6 +43,7 @@ module stage_mem(clk_i, rst_i, is_ld_mem_i, is_st_mem_i, funct3_i, mem_data_i, m
 
 
     lsu_comb exe_lsu_comb (.funct3_i(funct3_i),
+                           .is_mem_i(is_mem),
                            .st_data_i(mem_data_i),
                            .ld_data_i(wbm_dat_i),
                            .addr_i(mem_addr_i),

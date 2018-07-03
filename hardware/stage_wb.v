@@ -91,7 +91,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
 
        
     // Write-Back Mux
-    always @(posedge clk_i) begin
+    always @(*) begin
         /* verilator lint_off CASEINCOMPLETE */
             rd_o <= instruction_i[11:7];
         case (opcode)
