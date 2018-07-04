@@ -284,6 +284,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 						   .rst_i(rst_i),
 						   .pc_i(mem_wb_o[`R_PC]),
 						   .instruction_i(mem_wb_o[`R_INSTRUCTION]),
+						   .rs1_i(mem_wb_o[`R_RS1]),
 						   .funct3_i(mem_wb_o[`R_FUNCT3]),
 						   .alu_d_i(mem_wb_o[`R_ALU_OUT]),
 						   .mem_d_i(mem_wb_o[`R_MEM_DATA_O]),

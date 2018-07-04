@@ -3,7 +3,7 @@
 * Anderson Contreras
 */
 
-module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, mem_addr_i, csr_addr_i, csr_data_i,
+module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, mem_d_i, mem_addr_i, csr_addr_i, csr_data_i,
                  xint_meip_i, xint_mtip_i, xint_msip_i, e_illegal_inst_i, e_inst_addr_mis_i, e_ld_addr_mis_i, e_st_addr_mis_i,
                  rd_o, rf_wd_o, we_rf_o, mtvec_o, is_exc_taken_o);
 
@@ -21,6 +21,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     input [31:0] pc_i;
     input [31:0] instruction_i;
     input [2:0] funct3_i;
+    input [4:0] rs1_i;
     input [31:0] alu_d_i;
     input [31:0] mem_d_i;
     input [31:0] mem_addr_i;
@@ -41,8 +42,10 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     output is_exc_taken_o;
 
     wire [6:0]opcode = instruction_i[6:0];
-    wire is_csr = (opcode == SYSTEM) && |funct3_i; 
-    wire rs1 = instruction_i[19:15];
+    wire is_csr   = (opcode == SYSTEM) && |funct3_i; 
+    wire is_load  = (opcode == LOAD); 
+    wire is_op    = (opcode == OP); 
+    wire is_opi   = (opcode == OPI); 
 
     reg [31:0] mcause, mstatus, mtval, csr_out;
 
@@ -53,7 +56,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
                 .addr_i(csr_addr_i),
                 .data_i(csr_data_i),
                 .is_csr_i(is_csr),
-                .rs1_i(rs1),
+                .rs1_i(rs1_i),
                 .we_exc_i(is_exc_taken_o),
                 .mcause_d_i(mcause),
                 .mepc_d_i(pc_i),
@@ -64,48 +67,48 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, funct3_i, alu_d_i, mem_d_i, 
     
 
     // Exception encoder
-    always @(posedge clk_i) begin
+    always @(*) begin
         /* verilator lint_off CASEINCOMPLETE */
         case(1'b1)
             e_illegal_inst_i: begin
-                mcause <= 2;
-                mtval  <= instruction_i;
+                mcause = 2;
+                mtval  = instruction_i;
             end
             e_inst_addr_mis_i: begin
-                mcause <= 0;
-                mtval  <= instruction_i;
+                mcause = 0;
+                mtval  = instruction_i;
             end
             e_ld_addr_mis_i: begin   
-                mcause <= 4;
-                mtval  <= mem_addr_i;
+                mcause = 4;
+                mtval  = mem_addr_i;
             end
             e_st_addr_mis_i: begin
-                mcause <= 06;
-                mtval  <= mem_addr_i;
+                mcause = 06;
+                mtval  = mem_addr_i;
             end
         endcase  
 
         /* verilator lint_on CASEINCOMPLETE */
-        is_exc_taken_o <= e_ld_addr_mis_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
+        is_exc_taken_o = e_ld_addr_mis_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
     end
 
        
     // Write-Back Mux
     always @(*) begin
         /* verilator lint_off CASEINCOMPLETE */
-            rd_o <= instruction_i[11:7];
+            rd_o = instruction_i[11:7];
         case (opcode)
-            OP:                   rf_wd_o <= alu_d_i;
-            OPI:                  rf_wd_o <= alu_d_i;
-            LOAD:                 rf_wd_o <= mem_d_i;
-            SYSTEM:    if(is_csr) rf_wd_o <= csr_out;
-            JAL:                  rf_wd_o <= pc_i + 3'b100;
-            JALR:                 rf_wd_o <= pc_i + 3'b100;
+            OP:                   rf_wd_o = alu_d_i;
+            OPI:                  rf_wd_o = alu_d_i;
+            LOAD:                 rf_wd_o = mem_d_i;
+            SYSTEM:    if(is_csr) rf_wd_o = csr_out;
+            JAL:                  rf_wd_o = pc_i + 32'b100;
+            JALR:                 rf_wd_o = pc_i + 32'b100;
         endcase
         /* verilator lint_on CASEINCOMPLETE */
 
         // Check if we need/can write to the registers
-        we_rf_o <= (((OP || LOAD || (SYSTEM && is_csr))) && !is_exc_taken_o) ? 1 : 0;
+        we_rf_o = ((is_op || is_opi || is_load || is_csr) && !is_exc_taken_o) ? 1 : 0;
     end
 
 endmodule
