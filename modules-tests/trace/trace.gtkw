@@ -1,17 +1,19 @@
 [*]
 [*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
-[*] Sat Jun 30 14:56:24 2018
+[*] Tue Jul 03 23:17:26 2018
 [*]
-[dumpfile] "..\..\build\vcd\trace.vcd"
-[dumpfile_mtime] "Wed Jun 27 15:14:14 2018"
-[dumpfile_size] 1763896
-[timestart] 5
-[size] 1366 705
+[dumpfile] "C:\msys64\home\LuisEduardo\Noname\build\vcd\trace.vcd"
+[dumpfile_mtime] "Tue Jul 03 22:48:43 2018"
+[dumpfile_size] 2752656
+[savefile] "C:\msys64\home\LuisEduardo\Noname\modules-tests\trace\trace.gtkw"
+[timestart] 134
+[size] 1536 801
 [pos] -1 -1
-*-5.000000 126 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.000000 165 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.top.
 [treeopen] TOP.top.cpu.
+[treeopen] TOP.top.cpu.core_stage_exe.
 [sst_width] 192
 [signals_width] 206
 [sst_expanded] 1
@@ -160,13 +162,6 @@ TOP.top.cpu.if_id_o[63:0]
 (63)TOP.top.cpu.if_id_o[63:0]
 @1401200
 -group_end
-@22
-TOP.top.cpu.id_exe_i[204:0]
-TOP.top.cpu.id_exe_o[204:0]
-TOP.top.cpu.exe_mem_i[237:0]
-TOP.top.cpu.exe_mem_o[237:0]
-TOP.top.cpu.mem_wb_i[271:0]
-TOP.top.cpu.mem_wb_o[271:0]
 @200
 -
 -Stage IF
@@ -192,9 +187,8 @@ TOP.top.cpu.core_stage_if.instruction_o[31:0]
 TOP.top.cpu.core_stage_if.exception_addr_i[31:0]
 @28
 TOP.top.cpu.core_stage_if.sel_addr_i[1:0]
-@23
-TOP.top.cpu.core_stage_if.br_j_addr_i[31:0]
 @22
+TOP.top.cpu.core_stage_if.br_j_addr_i[31:0]
 TOP.top.cpu.core_stage_if.exception_addr_i[31:0]
 @28
 TOP.top.cpu.core_stage_if.stall_i
@@ -233,6 +227,35 @@ TOP.top.cpu.core_stage_id.is_system_o
 TOP.top.cpu.core_stage_id.e_illegal_inst_o
 TOP.top.cpu.id_exe_stall
 TOP.top.cpu.id_exe_flush
+TOP.top.cpu.core_stage_exe.is_br_inst_i
+@29
+TOP.top.cpu.core_stage_exe.branch_res
+@28
+TOP.top.cpu.core_stage_exe.is_jal_inst_i
+TOP.top.cpu.core_stage_exe.is_jalr_inst_i
+TOP.top.cpu.core_stage_exe.is_br_j_taken_o
+@22
+TOP.top.cpu.core_fwd_unit.rs1[4:0]
+TOP.top.cpu.core_fwd_unit.rs2[4:0]
+TOP.top.cpu.core_fwd_unit.EX_rd[4:0]
+@28
+TOP.top.cpu.core_fwd_unit.EX_inst[1:0]
+@22
+TOP.top.cpu.core_fwd_unit.MEM_rd[4:0]
+@28
+TOP.top.cpu.core_fwd_unit.MEM_inst[1:0]
+@22
+TOP.top.cpu.core_fwd_unit.WB_rd[4:0]
+@28
+TOP.top.cpu.core_fwd_unit.is_fwd_a_o
+@22
+TOP.top.cpu.core_fwd_unit.dat_fwd_a_o[31:0]
+TOP.top.cpu.core_stage_id.dat_a_o[31:0]
+@28
+TOP.top.cpu.core_fwd_unit.is_fwd_b_o
+@22
+TOP.top.cpu.core_fwd_unit.dat_fwd_b_o[31:0]
+TOP.top.cpu.core_stage_id.dat_b_o[31:0]
 @200
 -
 -Stage EXE
