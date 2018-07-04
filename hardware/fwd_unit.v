@@ -35,14 +35,14 @@ module fwd_unit(
 			is_fwd_b_o = 0;
 
 		//Execution 
-		if(((rs1 == EX_rd) && rs1) || ((rs2 == EX_rd) && rs2)) begin
+		if(((rs1 == EX_rd) && |rs1) || ((rs2 == EX_rd) && |rs2)) begin
 			if (EX_inst == inst_ex) begin
 				stall = 0;
-				if(rs1 && (rs1 == EX_rd))begin
+				if(|rs1 && (rs1 == EX_rd))begin
 					is_fwd_a_o = 1;   //fwd
 					dat_fwd_a_o = EX_dat;					
 				end
-				if(rs2 && (rs2 == EX_rd))begin
+				if(|rs2 && (rs2 == EX_rd))begin
 					is_fwd_b_o = 1;
 					dat_fwd_b_o = EX_dat;										
 				end
@@ -50,14 +50,14 @@ module fwd_unit(
 				stall = 1;
 		end 
 		// Memory
-		if(((rs1 == MEM_rd) && rs1) || ((rs2 == MEM_rd) && rs2)) begin
+		if(((rs1 == MEM_rd) && |rs1) || ((rs2 == MEM_rd) && |rs2)) begin
 			if (((MEM_inst == inst_mem) && mem_ack) || (MEM_inst == inst_ex)) begin
 				stall = 0;
-	            if(rs1 && (rs1 == MEM_rd) && (rs1 != EX_rd))begin
+	            if(|rs1 && (rs1 == MEM_rd) && (rs1 != EX_rd))begin
 					is_fwd_a_o = 1;   //fwd
 					dat_fwd_a_o = MEM_dat;					
 				end
-				if(rs2 && (rs2 == MEM_rd) && (rs2 != EX_rd))begin
+				if(|rs2 && (rs2 == MEM_rd) && (rs2 != EX_rd))begin
 					is_fwd_b_o = 1;
 					dat_fwd_b_o = MEM_dat;										
 				end
@@ -65,13 +65,13 @@ module fwd_unit(
 				stall = 1;
         end 
 		//WB
-		if(((rs1 == WB_rd) && rs1) || ((rs2 == WB_rd ) && rs2)) begin
+		if(((rs1 == WB_rd) && |rs1) || ((rs2 == WB_rd ) && |rs2)) begin
 				stall = 0;
-				if(rs1 && (rs1 == WB_rd) && (rs1 != EX_rd) && (rs1 != MEM_rd))begin
+				if(|rs1 && (rs1 == WB_rd) && (rs1 != EX_rd) && (rs1 != MEM_rd))begin
 					is_fwd_a_o = 1;   //fwd
 					dat_fwd_a_o = WB_dat;
 				end
-				if(rs2 && (rs2 == WB_rd) && (rs2 != EX_rd) && (rs2 != MEM_rd))begin
+				if(|rs2 && (rs2 == WB_rd) && (rs2 != EX_rd) && (rs2 != MEM_rd))begin
 					is_fwd_b_o = 1;
 					dat_fwd_b_o = WB_dat;					
 				end

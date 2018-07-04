@@ -65,9 +65,9 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     reg [31:0] minstreth;
     reg [31:0] mcounteren;
 
-    wire is_csrrw = funct3_i[1:0] && CSRRW;
-    wire is_csrrs = funct3_i[1:0] && CSRRS;
-    wire is_csrrc = funct3_i[1:0] && CSRRC;
+    wire is_csrrw = funct3_i[1:0] == CSRRW;
+    wire is_csrrs = funct3_i[1:0] == CSRRS;
+    wire is_csrrc = funct3_i[1:0] == CSRRC;
 
 
     assign mtvec_o = mtvec;
@@ -116,7 +116,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                 MCOUNTEREN_ADDR : data_out_o <= mcounteren;
             endcase
 
-            if (((!funct3_i[2] && rs1_i) || (funct3_i[2] && data_i)) && !is_csrrw) begin
+            if (((!funct3_i[2] && |rs1_i) || (funct3_i[2] && |data_i)) && !is_csrrw) begin
                 case (addr_i)
                     MISA_ADDR       : misa         <= is_csrrw ? data_i : (is_csrrs ? misa       | data_i: misa       & ~data_i);
                 //  MVENDORID_ADDR  : mvendorid    <= is_csrrw ? data_i : (is_csrrs ? mvendorid  | data_i: mvendorid  & ~data_i);
