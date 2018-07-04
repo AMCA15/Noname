@@ -93,7 +93,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
         endcase  
 
         /* verilator lint_on CASEINCOMPLETE */
-        is_exc_taken_o = e_ld_addr_mis_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
+        is_exc_taken_o = e_illegal_inst_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
     end
 
        

@@ -1,20 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
-[*] Wed Jul 04 02:45:05 2018
+[*] Wed Jul 04 20:47:47 2018
 [*]
 [dumpfile] "C:\msys64\home\LuisEduardo\Noname\build\vcd\trace.vcd"
-[dumpfile_mtime] "Wed Jul 04 02:22:41 2018"
-[dumpfile_size] 2558894
+[dumpfile_mtime] "Wed Jul 04 20:42:46 2018"
+[dumpfile_size] 3161140
 [savefile] "C:\msys64\home\LuisEduardo\Noname\modules-tests\trace\trace.gtkw"
-[timestart] 2336
+[timestart] 5
 [size] 1536 801
 [pos] -1 -1
-*-5.000000 2405 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.000000 9775 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.top.
 [treeopen] TOP.top.cpu.
 [treeopen] TOP.top.cpu.core_stage_exe.
 [treeopen] TOP.top.cpu.core_stage_id.
+[treeopen] TOP.top.cpu.core_stage_wb.
 [sst_width] 192
 [signals_width] 206
 [sst_expanded] 1
@@ -382,6 +383,7 @@ TOP.clk_i
 TOP.rst_i
 TOP.top.cpu.mem_wb_stall
 TOP.top.cpu.mem_wb_flush
+TOP.top.cpu.core_stage_wb.is_exc_taken_o
 @22
 TOP.top.cpu.core_stage_wb.pc_i[31:0]
 TOP.top.cpu.core_stage_wb.instruction_i[31:0]
@@ -391,6 +393,14 @@ TOP.top.cpu.core_stage_wb.rf_wd_o[31:0]
 TOP.top.cpu.core_stage_wb.we_rf_o
 @22
 TOP.top.cpu.core_stage_id.id_reg_file.regfile(5)[31:0]
+@200
+-
+-CSR
+@28
+TOP.top.cpu.core_stage_wb.wb_csr.clk_i
+TOP.top.cpu.core_stage_wb.wb_csr.we_exc_i
+@22
+TOP.top.cpu.core_stage_wb.wb_csr.mtvec_o[31:0]
 @200
 -
 -Forwarding
