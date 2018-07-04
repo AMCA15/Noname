@@ -10,6 +10,8 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     // Opcodes used for wb
     localparam OP       = 7'b0110011;
     localparam OPI      = 7'b0010011;
+    localparam LUI      = 7'b0110111;
+    localparam AUIPC    = 7'b0010111;
     localparam LOAD     = 7'b0000011;
     localparam SYSTEM   = 7'b1110011;
     localparam JAL      = 7'b1101111;
@@ -46,6 +48,8 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     wire is_load  = (opcode == LOAD); 
     wire is_op    = (opcode == OP); 
     wire is_opi   = (opcode == OPI); 
+    wire is_lui   = (opcode == LUI); 
+    wire is_auipc   = (opcode == AUIPC);  
 
     reg [31:0] mcause, mstatus, mtval, csr_out;
 
@@ -100,6 +104,8 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
         case (opcode)
             OP:                   rf_wd_o = alu_d_i;
             OPI:                  rf_wd_o = alu_d_i;
+            LUI:                  rf_wd_o = alu_d_i;
+            AUIPC:                rf_wd_o = alu_d_i;
             LOAD:                 rf_wd_o = mem_d_i;
             SYSTEM:    if(is_csr) rf_wd_o = csr_out;
             JAL:                  rf_wd_o = pc_i + 32'b100;
@@ -108,7 +114,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
         /* verilator lint_on CASEINCOMPLETE */
 
         // Check if we need/can write to the registers
-        we_rf_o = ((is_op || is_opi || is_load || is_csr) && !is_exc_taken_o) ? 1 : 0;
+        we_rf_o = ((is_op || is_opi || is_load || is_csr || is_lui || is_auipc) && !is_exc_taken_o) ? 1 : 0;
     end
 
 endmodule

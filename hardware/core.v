@@ -152,7 +152,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 
 	//---------------------------------------------------------------
 	// 						   Stage-MEM
-
+	wire [31:0] mem_fwd_dat;
 	//---------------------------------------------------------------
 	// 						   Stage-WB
 	wire is_exc_taken;
@@ -165,10 +165,10 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	fwd_unit core_fwd_unit(.EX_rd(id_exe_o[`R_RD]),
 						   .MEM_rd(exe_mem_o[`R_RD]),
 						   .WB_rd(mem_wb_o[`R_RD]),
-						   .EX_inst({id_exe_o[`R_IS_LD_MEM], id_exe_o[`R_IS_OP]}),
-						   .MEM_inst({exe_mem_o[`R_IS_LD_MEM], exe_mem_o[`R_IS_OP]}),
+						   .EX_inst({id_exe_o[`R_IS_LD_MEM], (id_exe_o[`R_IS_OP] || id_exe_o[`R_IS_LUI] || id_exe_o[`R_IS_AUIPC])}),
+						   .MEM_inst({exe_mem_o[`R_IS_LD_MEM], (exe_mem_o[`R_IS_OP] || exe_mem_o[`R_IS_LUI] || exe_mem_o[`R_IS_AUIPC])}),
 						   .EX_dat(exe_mem_i[`R_ALU_OUT]),
-						   .MEM_dat(mem_wb_i[`R_MEM_DATA_O]),
+						   .MEM_dat(mem_fwd_dat),
 						   .WB_dat(rf_wd),
 						   .mem_ack(dwbm_ack_i),
 						   .rs1(if_id_o[19:15]),
@@ -279,7 +279,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 							 .wbm_we_o(dwbm_we_o),
 							 .wbm_sel_o(dwbm_sel_o),
 							 .e_ld_addr_mis_o(mem_wb_e_ld_addr_mis_i),
-							 .e_st_addr_mis_o(mem_wb_e_st_addr_mis_i));
+							 .e_st_addr_mis_o(mem_wb_e_st_addr_mis_i),
+							 .mem_fwd_dat_o(mem_fwd_dat));
 
 	//---------------------------------------------------------------
 	// 						   Stage-WB
