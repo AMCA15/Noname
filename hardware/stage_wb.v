@@ -17,6 +17,13 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     localparam JAL      = 7'b1101111;
     localparam JALR     = 7'b1100111;
 
+    //Privileged 
+    localparam URET     = 12'b000000000010;
+    localparam SRET     = 12'b000100000010;
+    localparam MRET     = 12'b001100000010;
+    localparam ECALL    = 12'b000000000000;
+    localparam EBREAK   = 12'b000000000001;
+
     input clk_i;
     input rst_i;
 
@@ -52,6 +59,8 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     wire is_auipc   = (opcode == AUIPC);  
 
     reg [31:0] mcause, mstatus, mtval, csr_out;
+    wire aux;
+    wire [11:0] xret = instruction_i[31:20];
 
 
     csr wb_csr (.clk_i(clk_i),
@@ -66,6 +75,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
                 .mepc_d_i(pc_i),
                 .mtval_d_i(mtval),
                 .mstatus_d_i(mstatus),
+                .aux_i(aux),
                 .data_out_o(csr_out),
                 .mtvec_o(mtvec_o));
     
@@ -80,7 +90,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
             end
             e_inst_addr_mis_i: begin
                 mcause = 0;
-                mtval  = instruction_i;
+                mtval  = pc_i;
             end
             e_ld_addr_mis_i: begin   
                 mcause = 4;
@@ -91,23 +101,46 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
                 mtval  = mem_addr_i;
             end
         endcase  
+        if((opcode == SYSTEM) && (funct3_i == 0)) begin
+            case (xret)
+                // Me lo intente copiar del Algol :v
+                ECALL: begin
+                    aux = 1;
+                    mcause = 11;    //Machine external interrupt
+                    mtval  = 0;
+                    end 
+                EBREAK: begin
+                    aux = 1;
+                    mcause = 3;
+                    mtval  = pc_i;
+                    end 
+                default;
+            endcase // xret
+        end 
 
         /* verilator lint_on CASEINCOMPLETE */
-        is_exc_taken_o = e_illegal_inst_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i;
-    end
+ 
+        is_exc_taken_o = e_illegal_inst_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i | aux;
 
-       
+ 
+    end
+    wire is_xret;
+    assign is_xret = (xret == |{MRET,URET,SRET}) ? 1 : 0;
     // Write-Back Mux
     always @(*) begin
         /* verilator lint_off CASEINCOMPLETE */
             rd_o = instruction_i[11:7];
+            aux = 0;
         case (opcode)
             OP:                   rf_wd_o = alu_d_i;
             OPI:                  rf_wd_o = alu_d_i;
             LUI:                  rf_wd_o = alu_d_i;
             AUIPC:                rf_wd_o = alu_d_i;
             LOAD:                 rf_wd_o = mem_d_i;
-            SYSTEM:    if(is_csr) rf_wd_o = csr_out;
+            SYSTEM: begin    
+                    if(is_csr)    rf_wd_o <= csr_out;
+                    if(is_xret)   aux = 1; //mtvec_o <= mepc; 
+                    end             
             JAL:                  rf_wd_o = pc_i + 32'b100;
             JALR:                 rf_wd_o = pc_i + 32'b100;
         endcase
