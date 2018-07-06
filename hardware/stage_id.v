@@ -55,8 +55,11 @@ module stage_id(clk_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, 
     wire [31:0]  shamt;
     wire [31:0]  shamt_fwd;
     wire is_shift;
+    wire [31:0] rs1_dat;
+    wire [31:0] rs2_dat;
 
-
+    assign rs1_dat_o = is_fwd_a_i ? dat_fwd_a_i : rs1_dat;
+    assign rs2_dat_o = is_fwd_b_i ? dat_fwd_b_i : rs2_dat;
     assign imm_out_o = imm_out;
     assign shamt     = rs2_dat_o & 32'h1F;
     assign shamt_fwd = dat_fwd_b_i & 32'h1F;
@@ -90,8 +93,8 @@ module stage_id(clk_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, 
                          .rd_i(rd_i),
                          .rf_wd_i(rf_wd_i),
                          .we_i(rf_we_i),
-                         .rs1_d_o(rs1_dat_o),
-                         .rs2_d_o(rs2_dat_o));
+                         .rs1_d_o(rs1_dat),
+                         .rs2_d_o(rs2_dat));
 
     imm_gen id_imm_gen(.instruction_i(instruction_i),
                        .imm_op_i(imm_op),
@@ -102,14 +105,14 @@ module stage_id(clk_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, 
         /* verilator lint_off CASEINCOMPLETE */
         // Mux for ALU inputs
         case (sel_dat_a)
-            SEL_REG:  dat_a_o = is_fwd_a_i ? dat_fwd_a_i : rs1_dat_o;
+            SEL_REG:  dat_a_o = is_fwd_a_i ? dat_fwd_a_i : rs1_dat;
             SEL_IMM:  dat_a_o = imm_out;
             SEL_PC:   dat_a_o = pc_i;
             SEL_ZERO: dat_a_o = 0;
         endcase
 
         case (sel_dat_b)
-            SEL_REG:  dat_b_o =  is_fwd_b_i ? (is_shift ? shamt_fwd : dat_fwd_b_i) : (is_shift ? shamt : rs2_dat_o);
+            SEL_REG:  dat_b_o =  is_fwd_b_i ? (is_shift ? shamt_fwd : dat_fwd_b_i) : (is_shift ? shamt : rs2_dat);
             SEL_IMM:  dat_b_o = imm_out;
             SEL_PC:   dat_b_o = pc_i;
             SEL_ZERO: dat_b_o = 0;

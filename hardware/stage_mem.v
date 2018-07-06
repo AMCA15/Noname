@@ -69,9 +69,9 @@ module stage_mem(clk_i, rst_i, is_ld_mem_i, is_st_mem_i, funct3_i, mem_data_i, m
                  .wbm_we_o(wbm_we_o),
                  .wbm_sel_o(wbm_sel_o));
 
-    always @(negedge clk_i) begin
+    always @(*) begin
         if(wbm_ack_i)
-            mem_data_o <= ld_data_fmt;
+            mem_data_o = ld_data_fmt;
     end
 
 endmodule

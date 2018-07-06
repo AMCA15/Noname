@@ -78,7 +78,7 @@ module decoder(instruction_i,
   assign funct3_o        = instruction_i[14:12];
   assign rs1_o           = instruction_i[19:15];
   assign rs2_o           = (is_op_o || is_branch_o || is_st_mem_o)? instruction_i[24:20] : 0;
-  assign rd_o            = instruction_i[11:7];
+  assign rd_o            = (is_branch_o || is_st_mem_o)? 0 : instruction_i[11:7];
   assign csr_addr_o      = instruction_i[31:20];
 
 
