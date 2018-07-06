@@ -109,7 +109,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
         case (1'b1)
             is_ld_mem_i:                    rf_wd_o = mem_d_i;
             is_csr:                         rf_wd_o = csr_out;             
-            is_jal_i|is_jalr_i:             rf_wd_o = alu_d_i;
+            is_jal_i|is_jalr_i:             rf_wd_o = pc_i + 4;
             is_op_i|is_lui_i|is_auipc_i:    rf_wd_o = alu_d_i;
             default;
         endcase

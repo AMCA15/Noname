@@ -8,6 +8,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
 
     // CSR Address
     localparam MISA_ADDR       = 'h301;
+    localparam MEDELEG_ADDR    = 'h302;
     localparam MVENDORID_ADDR  = 'hF11;
     localparam MARCHID_ADDR    = 'hF12;
     localparam MIMPID_ADDR     = 'hF13;
@@ -24,6 +25,8 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     localparam MINSTRET_ADDR   = 'hB02;
     localparam MINSTRETH_ADDR  = 'hB82;
     localparam MCOUNTEREN_ADDR = 'h306;
+    localparam PMPCFG0_ADDR    = 'h3A0;
+    localparam PMPADDR0_ADDR   = 'h3B0;
 
     // CSR Instruction
     localparam CSRRW = 2'b01;
@@ -49,6 +52,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     output [31:0] exc_ret_addr_o;
 
     reg [31:0] misa;
+    reg [31:0] medeleg;
     reg [31:0] mvendorid;
     reg [31:0] marchid;
     reg [31:0] mimpid;
@@ -65,6 +69,8 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     reg [31:0] minstret;
     reg [31:0] minstreth;
     reg [31:0] mcounteren;
+    reg [31:0] pmpcfg0;
+    reg [31:0] pmpaddr0;
 
     wire is_csrrw = funct3_i[1:0] == CSRRW;
     wire is_csrrs = funct3_i[1:0] == CSRRS;
@@ -76,6 +82,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     always @(*) begin
         if (rst_i) begin
     	    misa        = 0;
+    	    medeleg     = 0;
             mvendorid   = 0;
             marchid     = 0;
             mimpid      = 0;
@@ -91,6 +98,8 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
             minstret    = 0;
             minstreth   = 0;
             mcounteren  = 0;
+            pmpcfg0     = 0;
+            pmpaddr0    = 0;
         end
 
         /* verilator lint_off CASEINCOMPLETE */
@@ -99,6 +108,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
             // Read the old data before write
             case (addr_i)
                 MISA_ADDR       : data_out_o = misa;
+                MEDELEG_ADDR    : data_out_o = medeleg;
                 MVENDORID_ADDR  : data_out_o = mvendorid;
                 MARCHID_ADDR    : data_out_o = marchid;
                 MIMPID_ADDR     : data_out_o = mimpid;
@@ -115,11 +125,14 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                 MINSTRET_ADDR   : data_out_o = minstret;
                 MINSTRETH_ADDR  : data_out_o = minstreth;
                 MCOUNTEREN_ADDR : data_out_o = mcounteren;
+                PMPCFG0_ADDR    : data_out_o = pmpcfg0;
+                PMPADDR0_ADDR   : data_out_o = pmpaddr0;
             endcase
 
             if ((!funct3_i[2] && |rs1_i) || (funct3_i[2] && |data_i)) begin
                 case (addr_i)
                     MISA_ADDR       : misa         = is_csrrw ? data_i : (is_csrrs ? misa       | data_i: misa       & ~data_i);
+                    MEDELEG_ADDR    : medeleg      = is_csrrw ? data_i : (is_csrrs ? medeleg    | data_i: medeleg    & ~data_i);
                 //  MVENDORID_ADDR  : mvendorid    = is_csrrw ? data_i : (is_csrrs ? mvendorid  | data_i: mvendorid  & ~data_i);
                 //  MARCHID_ADDR    : marchid      = is_csrrw ? data_i : (is_csrrs ? marchid    | data_i: marchid    & ~data_i);
                 //  MIMPID_ADDR     : mimpid       = is_csrrw ? data_i : (is_csrrs ? mimpid     | data_i: mimpid     & ~data_i);
@@ -136,6 +149,8 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                     MINSTRET_ADDR   : minstret     = is_csrrw ? data_i : (is_csrrs ? minstret   | data_i: minstret   & ~data_i);
                     MINSTRETH_ADDR  : minstreth    = is_csrrw ? data_i : (is_csrrs ? minstreth  | data_i: minstreth  & ~data_i);
                     MCOUNTEREN_ADDR : mcounteren   = is_csrrw ? data_i : (is_csrrs ? mcounteren | data_i: mcounteren & ~data_i);
+                    PMPCFG0_ADDR    : pmpcfg0      = is_csrrw ? data_i : (is_csrrs ? pmpcfg0    | data_i: pmpcfg0   & ~data_i);
+                    PMPADDR0_ADDR   : pmpaddr0     = is_csrrw ? data_i : (is_csrrs ? pmpaddr0   | data_i: pmpaddr0   & ~data_i);
                     default;
                 endcase
             end
