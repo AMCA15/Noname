@@ -133,7 +133,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	//---------------------------------------------------------------
 	// 						    Stage-IF
 	wire [31:0] br_j_addr;
-	wire [31:0] exception_addr;
+	wire [31:0] exc_ret_addr;
 
 	//---------------------------------------------------------------
 	// 						   Stage-ID
@@ -191,7 +191,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 		     core_stage_if(.clk_i(clk_i),
 						   .rst_i(rst_i),
 						   .br_j_addr_i(br_j_addr),
-						   .exception_addr_i(exception_addr),
+						   .exc_ret_addr_i(exc_ret_addr),
 						   .sel_addr_i({is_exc_taken, is_br_j_taken}),
 						   .stall_i(if_id_stall),
 						   .instruction_o(if_id_instruction_i),
@@ -296,6 +296,13 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 						   .mem_addr_i(mem_wb_o[`R_ALU_OUT]),
 						   .csr_addr_i(mem_wb_o[`R_CSR_ADDR]),
 						   .csr_data_i(mem_wb_o[`R_ALU_OUT]),
+						   .is_op_i(mem_wb_o[`R_IS_OP]),
+						   .is_lui_i(mem_wb_o[`R_IS_LUI]),
+						   .is_auipc_i(mem_wb_o[`R_IS_AUIPC]),
+						   .is_ld_mem_i(mem_wb_o[`R_IS_LD_MEM]),
+						   .is_system_i(mem_wb_o[`R_IS_SYSTEM]),
+						   .is_jal_i(mem_wb_o[`R_IS_JAL]),
+						   .is_jalr_i(mem_wb_o[`R_IS_JALR]),
 						   .xint_meip_i(xint_meip_i),
 						   .xint_mtip_i(xint_mtip_i),
 						   .xint_msip_i(xint_msip_i),
@@ -306,7 +313,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 						   .rd_o(rf_w),
 						   .rf_wd_o(rf_wd),
 						   .we_rf_o(rf_we),
-						   .mtvec_o(exception_addr),
+						   .exc_ret_addr_o(exc_ret_addr),
 						   .is_exc_taken_o(is_exc_taken));
 
 endmodule

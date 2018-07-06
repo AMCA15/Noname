@@ -4,7 +4,7 @@
 */
 
 module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mcause_d_i, mepc_d_i, mtval_d_i,
-            mstatus_d_i, aux_i, data_out_o, mtvec_o);
+            mstatus_d_i, sel_exc_nret_i, data_out_o, exc_ret_addr_o);
 
     // CSR Address
     localparam MISA_ADDR       = 'h301;
@@ -44,9 +44,9 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     input [31:0] mepc_d_i;
     input [31:0] mstatus_d_i;
     input [31:0] mtval_d_i;
-    input aux_i;
+    input sel_exc_nret_i;
     output reg [31:0] data_out_o;
-    output [31:0] mtvec_o;
+    output [31:0] exc_ret_addr_o;
 
     reg [31:0] misa;
     reg [31:0] mvendorid;
@@ -71,13 +71,8 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     wire is_csrrc = funct3_i[1:0] == CSRRC;
 
 
-    always @(*) begin  
-        if(aux_i) 
-            mtvec_o <= mepc;
-        else      
-            mtvec_o <= mtvec;
-    end
-    
+    assign exc_ret_addr_o = sel_exc_nret_i ? mepc : mtvec;
+
     always @(*) begin
         if (rst_i) begin
     	    misa        = 0;
