@@ -42,7 +42,7 @@ module stage_mem(clk_i, rst_i, is_ld_mem_i, is_st_mem_i, funct3_i, mem_data_i, m
     assign wbm_we_o   = is_st_mem_i;
     assign wbm_sel_o  = st_sel;
     assign kill = e_ld_addr_mis_o || e_st_addr_mis_o || rst_i;
-    assign mem_fwd_dat_o = is_ld_mem_i? wbm_dat_i : mem_addr_i;
+    assign mem_fwd_dat_o = is_ld_mem_i? mem_data_o: mem_addr_i;
 
 
     lsu_comb exe_lsu_comb (.funct3_i(funct3_i),
