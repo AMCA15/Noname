@@ -52,10 +52,15 @@ module stage_id(clk_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, 
     wire [31:0] imm_out;
     wire [1:0]  sel_dat_a;
     wire [1:0]  sel_dat_b;
+    wire [31:0]  shamt;
+    wire [31:0]  shamt_fwd;
+    wire is_shift;
 
 
     assign imm_out_o = imm_out;
-
+    assign shamt     = rs2_dat_o & 32'h1F;
+    assign shamt_fwd = dat_fwd_b_i & 32'h1F;
+    assign is_shift = (instruction_i[6:0] == 7'b0110011) && ((funct3_o == 0'b001) || (funct3_o == 0'b101));
 
     decoder id_decoder(.instruction_i(instruction_i),
                        .funct3_o(funct3_o),
@@ -104,7 +109,7 @@ module stage_id(clk_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, 
         endcase
 
         case (sel_dat_b)
-            SEL_REG:  dat_b_o = is_fwd_b_i ? dat_fwd_b_i : rs2_dat_o;
+            SEL_REG:  dat_b_o =  is_fwd_b_i ? (is_shift ? shamt_fwd : dat_fwd_b_i) : (is_shift ? shamt : rs2_dat_o);
             SEL_IMM:  dat_b_o = imm_out;
             SEL_PC:   dat_b_o = pc_i;
             SEL_ZERO: dat_b_o = 0;
