@@ -34,9 +34,9 @@ module branch_unit(branch_op_i, equ_i, lt_i, ltu_i, is_branch_taken_o);
 			BEQ : is_branch_taken_o = equ_i ? 1 : 0;
 			BNE : is_branch_taken_o = ~equ_i ? 1 : 0;
 			BLT : is_branch_taken_o = lt_i ? 1 : 0;
-			BGE : is_branch_taken_o = (equ_i && ~lt_i) ? 1 : 0;
+			BGE : is_branch_taken_o = (equ_i || ~lt_i) ? 1 : 0;
 			BLTU: is_branch_taken_o = ltu_i ? 1 : 0;
-			BGEU: is_branch_taken_o = (equ_i && ~ltu_i) ? 1 : 0;
+			BGEU: is_branch_taken_o = (equ_i || ~ltu_i) ? 1 : 0;
 			default is_branch_taken_o = 0;
 		endcase // branch_op_i
 	end
