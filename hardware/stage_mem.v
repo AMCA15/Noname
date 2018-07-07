@@ -39,7 +39,7 @@ module stage_mem(clk_i, rst_i, is_ld_mem_i, is_st_mem_i, funct3_i, mem_data_i, m
     wire is_mem = is_st_mem_i || is_ld_mem_i;
 
     assign wbm_addr_o = mem_addr_i;
-    assign wbm_we_o   = is_st_mem_i;
+    assign wbm_we_o   = is_st_mem_i && !(e_st_addr_mis_o);
     assign wbm_sel_o  = st_sel;
     assign kill = e_ld_addr_mis_o || e_st_addr_mis_o || rst_i;
     assign mem_fwd_dat_o = is_ld_mem_i? mem_data_o: mem_addr_i;
@@ -50,6 +50,7 @@ module stage_mem(clk_i, rst_i, is_ld_mem_i, is_st_mem_i, funct3_i, mem_data_i, m
                            .st_data_i(mem_data_i),
                            .ld_data_i(wbm_dat_i),
                            .addr_i(mem_addr_i),
+                           .we_i(is_st_mem_i),
                            .st_data_fmt_o(wbm_dat_o),
                            .ld_data_fmt_o(ld_data_fmt),
                            .st_sel_o(st_sel),

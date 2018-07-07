@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
-[*] Sat Jul 07 01:05:09 2018
+[*] Sat Jul 07 01:36:10 2018
 [*]
 [dumpfile] "C:\msys64\home\LuisEduardo\Noname\build\vcd\trace.vcd"
-[dumpfile_mtime] "Sat Jul 07 00:54:33 2018"
-[dumpfile_size] 6149049
+[dumpfile_mtime] "Sat Jul 07 01:32:55 2018"
+[dumpfile_size] 6149051
 [savefile] "C:\msys64\home\LuisEduardo\Noname\modules-tests\trace\trace.gtkw"
-[timestart] 4308
+[timestart] 4007
 [size] 1536 801
 [pos] -1 -1
-*-5.000000 4385 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.000000 4045 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.top.
 [treeopen] TOP.top.cpu.
@@ -373,7 +373,7 @@ TOP.top.cpu.core_stage_mem.st_sel[3:0]
 @28
 TOP.top.cpu.core_stage_mem.wbm_we_o
 TOP.top.cpu.core_stage_mem.is_st_mem_i
-@23
+@22
 TOP.top.cpu.core_stage_mem.wbm_dat_o[31:0]
 @28
 TOP.top.cpu.core_stage_mem.wbm_ack_i
@@ -384,8 +384,6 @@ TOP.top.cpu.core_stage_mem.is_ld_mem_i
 @22
 TOP.top.cpu.core_stage_mem.wbm_dat_i[31:0]
 TOP.top.cpu.core_stage_mem.ld_data_fmt[31:0]
-@28
-TOP.top.cpu.core_stage_exe.e_inst_addr_mis_o
 @200
 -
 -Stage WB
@@ -401,7 +399,11 @@ TOP.top.cpu.core_stage_wb.instruction_i[31:0]
 TOP.top.cpu.core_stage_wb.rd_o[4:0]
 TOP.top.cpu.core_stage_wb.rf_wd_o[31:0]
 @28
+TOP.top.cpu.core_stage_wb.e_st_addr_mis_i
+TOP.top.cpu.core_stage_wb.e_ld_addr_mis_i
 TOP.top.cpu.core_stage_wb.we_rf_o
+@22
+TOP.top.cpu.core_stage_wb.mcause[31:0]
 @200
 -
 -CSR

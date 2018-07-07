@@ -4,7 +4,7 @@
 * Luis Ruiz
 */
 
-module lsu_comb(funct3_i, is_mem_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o, ld_data_fmt_o, st_sel_o,
+module lsu_comb(funct3_i, is_mem_i, st_data_i, ld_data_i, addr_i, we_i, st_data_fmt_o, ld_data_fmt_o, st_sel_o,
                 e_ld_addr_mis_o, e_st_addr_mis_o);
 
 	localparam LB  = 3'b000;
@@ -22,6 +22,7 @@ module lsu_comb(funct3_i, is_mem_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o,
 	input [31:0]  st_data_i;
 	input [31:0]  ld_data_i;
 	input [31:0]  addr_i;
+	input		  we_i;
 	output [31:0] st_data_fmt_o;
 	output [31:0] ld_data_fmt_o;
 	output [3:0] st_sel_o;
@@ -33,7 +34,7 @@ module lsu_comb(funct3_i, is_mem_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o,
 	/* verilator lint_off WIDTH */
 	always @(*) begin
 		e_ld_addr_mis_o = 0;
-		if(is_mem_i) begin
+		if(is_mem_i && !we_i) begin
 			case (funct3_i)
 				LB:  begin
 	                case (addr_i[1:0])
@@ -76,7 +77,7 @@ module lsu_comb(funct3_i, is_mem_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o,
 
 	always @(*) begin
 		e_st_addr_mis_o = 0;
-		if(is_mem_i) begin	
+		if(is_mem_i && we_i) begin	
 			case (funct3_i)
 				SB: begin
 	        	    st_data_fmt_o = {4{st_data_i[7:0]}};

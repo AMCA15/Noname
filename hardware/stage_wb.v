@@ -91,6 +91,10 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
                 mcause = 4;
                 mtval  = mem_addr_i;
             end
+            e_st_addr_mis_i: begin
+                mcause = 6;
+                mtval  = mem_addr_i;
+            end
             e_ecall: begin
                 mcause = 11;
                 mtval  = mem_addr_i;
