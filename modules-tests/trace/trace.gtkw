@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
-[*] Sat Jul 07 01:36:10 2018
+[*] Sat Jul 07 15:05:05 2018
 [*]
 [dumpfile] "C:\msys64\home\LuisEduardo\Noname\build\vcd\trace.vcd"
-[dumpfile_mtime] "Sat Jul 07 01:32:55 2018"
-[dumpfile_size] 6149051
+[dumpfile_mtime] "Sat Jul 07 14:57:48 2018"
+[dumpfile_size] 444648
 [savefile] "C:\msys64\home\LuisEduardo\Noname\modules-tests\trace\trace.gtkw"
-[timestart] 4007
+[timestart] 951
 [size] 1536 801
 [pos] -1 -1
-*-5.000000 4045 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.000000 995 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.top.
 [treeopen] TOP.top.cpu.
@@ -411,11 +411,18 @@ TOP.top.cpu.core_stage_wb.mcause[31:0]
 TOP.top.cpu.core_stage_wb.wb_csr.clk_i
 @22
 TOP.top.cpu.core_stage_wb.wb_csr.addr_i[11:0]
+TOP.top.cpu.core_stage_wb.wb_csr.data_i[31:0]
 @28
 TOP.top.cpu.core_stage_wb.wb_csr.is_csr_i
+TOP.top.cpu.core_stage_wb.wb_csr.is_csrrw
+TOP.top.cpu.core_stage_wb.wb_csr.is_csrrc
+TOP.top.cpu.core_stage_wb.wb_csr.is_csrrs
 TOP.top.cpu.core_stage_wb.wb_csr.we_exc_i
 @22
+TOP.top.cpu.core_stage_wb.wb_csr.mscrath[31:0]
 TOP.top.cpu.core_stage_wb.wb_csr.data_out_o[31:0]
+@29
+TOP.top.cpu.core_stage_wb.wb_csr.funct3_i[2:0]
 @200
 -
 -Forwarding

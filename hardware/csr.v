@@ -145,8 +145,22 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                 SATP       : data_out_o = satp;
                 default    : e_illegal_inst_csr_o = 1;
             endcase
+        end
+            if (we_exc_i) begin
+                mepc    = mepc_d_i;
+                mcause  = mcause_d_i;
+                mstatus = mstatus_d_i;
+                mtval   = mtval_d_i;
+            end
 
-            if ((!funct3_i[2] && |rs1_i) || (funct3_i[2] && |data_i)) begin
+            if (is_int_i) begin
+                mcause = mcause_d_i;
+                mip = mip_d_i;
+            end
+    end
+
+    always @(posedge clk_i) begin
+        if ((!funct3_i[2] && |rs1_i) || (funct3_i[2] && (data_i != 0))) begin
                 case (addr_i)
                     MISA       : misa         = is_csrrw ? data_i : (is_csrrs ? misa       | data_i: misa       & ~data_i);
                     MEDELEG    : medeleg      = is_csrrw ? data_i : (is_csrrs ? medeleg    | data_i: medeleg    & ~data_i);
@@ -173,21 +187,9 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                     SATP       : satp         = is_csrrw ? data_i : (is_csrrs ? satp       | data_i: satp       & ~data_i);
                     default;
                 endcase
-            end
-            /* verilator lint_on CASEINCOMPLETE */
-        end
-        // Update register with the exceptions data
-        if (we_exc_i) begin
-            mepc    = mepc_d_i;
-            mcause  = mcause_d_i;
-            mstatus = mstatus_d_i;
-            mtval   = mtval_d_i;
-        end
-
-        if (is_int_i) begin
-            mcause = mcause_d_i;
-            mip = mip_d_i;
-        end
-
+        end 
     end
+            
+
+        
 endmodule

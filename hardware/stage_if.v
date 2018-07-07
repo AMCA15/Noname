@@ -70,6 +70,7 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exc_ret_addr_i, sel_addr_i, stall_i,
         SECUENTIAL_ADDR: if (!stall_i && !wbm_cyc_o) pc_o <= pc_o + 4;
         BRANCH_ADDR:     pc_o <= (!stall_i && !wbm_cyc_o) ? br_j_addr_i : br_j_addr_i;
         EXCEPTION_ADDR:  pc_o <= (!stall_i && !wbm_cyc_o) ? exc_ret_addr_i : exc_ret_addr_i;
+        default:         pc_o <= (!stall_i && !wbm_cyc_o) ? exc_ret_addr_i : exc_ret_addr_i;
       endcase
     /* verilator lint_on CASEINCOMPLETE */
     
