@@ -162,6 +162,7 @@ module decoder(instruction_i,
         imm_op_o    = IMM_SH;
         sel_dat_a_o = SEL_REG;
         sel_dat_b_o = SEL_IMM;
+        e_illegal_inst_o = ((funct3_o == 0'b001) || (funct3_o == 0'b101)) && instruction_i[25] ? 1: 0;
         case (funct3_o)
           3'b001: alu_op_o = {instruction_i[30], funct3_o};
           3'b101: alu_op_o = {instruction_i[30], funct3_o};
