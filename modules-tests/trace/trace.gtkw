@@ -1,14 +1,14 @@
 [*]
 [*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
-[*] Sat Jul 07 15:05:05 2018
+[*] Sat Jul 07 16:39:57 2018
 [*]
 [dumpfile] "C:\msys64\home\LuisEduardo\Noname\build\vcd\trace.vcd"
-[dumpfile_mtime] "Sat Jul 07 14:57:48 2018"
-[dumpfile_size] 444648
+[dumpfile_mtime] "Sat Jul 07 16:36:15 2018"
+[dumpfile_size] 4352025
 [savefile] "C:\msys64\home\LuisEduardo\Noname\modules-tests\trace\trace.gtkw"
-[timestart] 951
+[timestart] 1381
 [size] 1536 801
-[pos] -1 -1
+[pos] -139 -139
 *-5.000000 995 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.top.
@@ -19,7 +19,7 @@
 [sst_width] 192
 [signals_width] 206
 [sst_expanded] 1
-[sst_vpaned_height] 369
+[sst_vpaned_height] 491
 @200
 -Registers
 @28
@@ -419,7 +419,6 @@ TOP.top.cpu.core_stage_wb.wb_csr.is_csrrc
 TOP.top.cpu.core_stage_wb.wb_csr.is_csrrs
 TOP.top.cpu.core_stage_wb.wb_csr.we_exc_i
 @22
-TOP.top.cpu.core_stage_wb.wb_csr.mscrath[31:0]
 TOP.top.cpu.core_stage_wb.wb_csr.data_out_o[31:0]
 @29
 TOP.top.cpu.core_stage_wb.wb_csr.funct3_i[2:0]

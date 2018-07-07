@@ -47,13 +47,14 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	//---------------------------------------------------------------
 	// 						       IF/ID
 	wire if_id_stall = (fwd_stall || id_exe_stall) && !if_id_flush;
-	wire if_id_flush = is_br_j_taken || is_exc_taken || (iwbm_cyc_o && !if_id_stall);
+	wire if_id_flush = is_br_j_taken || is_exc_taken || (iwbm_cyc_o && !if_id_stall) || b_asynch;
 	wire [63:0] if_id_i = {if_id_pc_i, if_id_instruction_i};
 	reg  [63:0] if_id_o;
 	
 	// Signals
 	wire [31:0] if_id_instruction_i;
 	wire [31:0] if_id_pc_i;
+	wire b_asynch;
 
 	//---------------------------------------------------------------
 	// 						       ID/EXE
@@ -197,6 +198,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 						   .stall_i(if_id_stall),
 						   .instruction_o(if_id_instruction_i),
 						   .pc_o(if_id_pc_i),
+						   .b_asynch_o(b_asynch),
 						   .wbm_dat_i(iwbm_dat_i),
 						   .wbm_ack_i(iwbm_ack_i),
 						   .wbm_err_i(iwbm_err_i),

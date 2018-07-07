@@ -4,7 +4,7 @@
 */
 
 module stage_if(clk_i, rst_i, br_j_addr_i, exc_ret_addr_i, sel_addr_i, stall_i,
-                instruction_o, pc_o, wbm_dat_i, wbm_ack_i, wbm_err_i,
+                instruction_o, pc_o, b_asynch_o, wbm_dat_i, wbm_ack_i, wbm_err_i,
                 wbm_cyc_o, wbm_stb_o, wbm_dat_o, wbm_addr_o, wbm_we_o, wbm_sel_o);
   
   parameter [31:0] RESET_ADDR       = 32'h0;
@@ -36,6 +36,7 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exc_ret_addr_i, sel_addr_i, stall_i,
 /*----------------------------*/
   wire wbm_re;
   wire [3:0] wbm_sel;
+  output reg b_asynch_o;
 
 
   // Assigns
@@ -65,16 +66,19 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exc_ret_addr_i, sel_addr_i, stall_i,
       instruction_o <= `NOP;
     end
     else begin
+      b_asynch_o <= 0;
     /* verilator lint_off CASEINCOMPLETE */
       case (sel_addr_i)
         SECUENTIAL_ADDR: if (!stall_i && !wbm_cyc_o) pc_o <= pc_o + 4;
-        BRANCH_ADDR:     pc_o <= (!stall_i && !wbm_cyc_o) ? br_j_addr_i : br_j_addr_i;
+        BRANCH_ADDR:     pc_o <= (!stall_i && !wbm_cyc_o) ? br_j_addr_i : br_j_addr_i - 4;
         EXCEPTION_ADDR:  pc_o <= (!stall_i && !wbm_cyc_o) ? exc_ret_addr_i : exc_ret_addr_i;
         default:         pc_o <= (!stall_i && !wbm_cyc_o) ? exc_ret_addr_i : exc_ret_addr_i;
       endcase
     /* verilator lint_on CASEINCOMPLETE */
+
+    if(wbm_ack_i && (sel_addr_i == BRANCH_ADDR)) b_asynch_o <= 1; 
     
-    instruction_o <= wbm_ack_i ? wbm_dat_i : instruction_o;
+    instruction_o <= wbm_ack_i ? wbm_dat_i  : instruction_o;
     
     end
   end
