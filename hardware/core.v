@@ -92,7 +92,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 
 	//---------------------------------------------------------------
 	// 						      EXE/MEM
-	wire exe_mem_stall = mem_wb_stall || ((exe_mem_o[`R_IS_LD_MEM] || exe_mem_o[`R_IS_ST_MEM]) && !exe_mem_e_inst_addr_mis_o) && !(dwbm_ack_i || dwbm_err_i);
+	wire exe_mem_stall = mem_wb_stall || ((exe_mem_o[`R_IS_LD_MEM] || exe_mem_o[`R_IS_ST_MEM]) && !(mem_wb_e_ld_addr_mis_i || mem_wb_e_st_addr_mis_i)) && !(dwbm_ack_i || dwbm_err_i);
 	wire exe_mem_flush = is_exc_taken;
 	wire [301:0] exe_mem_i = {exe_mem_e_inst_addr_mis_o, exe_mem_alu_out_i, id_exe_o};
 	reg  [301:0] exe_mem_o;

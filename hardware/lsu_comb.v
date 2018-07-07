@@ -32,6 +32,7 @@ module lsu_comb(funct3_i, is_mem_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o,
 	/* verilator lint_off CASEINCOMPLETE */
 	/* verilator lint_off WIDTH */
 	always @(*) begin
+		e_ld_addr_mis_o = 0;
 		if(is_mem_i) begin
 			case (funct3_i)
 				LB:  begin
@@ -74,6 +75,7 @@ module lsu_comb(funct3_i, is_mem_i, st_data_i, ld_data_i, addr_i, st_data_fmt_o,
 
 
 	always @(*) begin
+		e_st_addr_mis_o = 0;
 		if(is_mem_i) begin	
 			case (funct3_i)
 				SB: begin

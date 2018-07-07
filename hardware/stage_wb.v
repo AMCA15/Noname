@@ -49,6 +49,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     reg [31:0] mcause, mstatus, mtval, csr_out;
 
 
+    reg we_exc_o =  is_exc_taken_o && !is_xret;
     wire is_csr  =  is_system_i &&  |funct3_i;
     wire e_ecall =  is_system_i && !|funct3_i && (instruction_i[31:20] == ECALL);
     wire e_break =  is_system_i && !|funct3_i && (instruction_i[31:20] == EBREAK);
@@ -62,7 +63,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
                 .data_i(csr_data_i),
                 .is_csr_i(is_csr),
                 .rs1_i(rs1_i),
-                .we_exc_i(is_exc_taken_o),
+                .we_exc_i(we_exc_o),
                 .mcause_d_i(mcause),
                 .mepc_d_i(pc_i),
                 .mtval_d_i(mtval),
@@ -74,7 +75,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
 
     // Exception encoder
     always @(*) begin
-        is_exc_taken_o = e_illegal_inst_i || e_inst_addr_mis_i || e_ld_addr_mis_i || e_st_addr_mis_i || e_ecall || e_break;
+        is_exc_taken_o = e_illegal_inst_i || e_inst_addr_mis_i || e_ld_addr_mis_i || e_st_addr_mis_i || e_ecall || e_break || is_xret;
         
         /* verilator lint_off CASEINCOMPLETE */
         case(1'b1)
