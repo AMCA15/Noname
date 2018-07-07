@@ -27,9 +27,6 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     localparam MINSTRET   = 'hB02;
     localparam MINSTRETH  = 'hB82;
     localparam MCOUNTEREN = 'h306;
-    localparam PMPCFG0    = 'h3A0;
-    localparam PMPADDR0   = 'h3B0;
-    localparam SATP       = 'h180;
 
     // CSR Instruction
     localparam CSRRW = 2'b01;
@@ -78,9 +75,6 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     reg [31:0] minstret;
     reg [31:0] minstreth;
     reg [31:0] mcounteren;
-    reg [31:0] pmpcfg0;
-    reg [31:0] pmpaddr0;
-    reg [31:0] satp;
 
     wire is_csrrw = funct3_i[1:0] == CSRRW;
     wire is_csrrs = funct3_i[1:0] == CSRRS;
@@ -89,6 +83,8 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     assign exc_ret_addr_o = sel_exc_nret_i ? mepc : mtvec;
 
     always @(*) begin
+        e_illegal_inst_csr_o = 0;
+        
         if (rst_i) begin
     	    misa        = 0;
     	    medeleg     = 0;
@@ -109,15 +105,11 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
             minstret    = 0;
             minstreth   = 0;
             mcounteren  = 0;
-            pmpcfg0     = 0;
-            pmpaddr0    = 0;
-            satp        = 0;
         end
 
         /* verilator lint_off CASEINCOMPLETE */
         // If it's a CSR instruction write the new data in the register
         else if (is_csr_i) begin
-            e_illegal_inst_csr_o = 0;
             // Read the old data before write
             case (addr_i)
                 MISA       : data_out_o = misa;
@@ -140,23 +132,25 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                 MINSTRET   : data_out_o = minstret;
                 MINSTRETH  : data_out_o = minstreth;
                 MCOUNTEREN : data_out_o = mcounteren;
-                PMPCFG0    : data_out_o = pmpcfg0;
-                PMPADDR0   : data_out_o = pmpaddr0;
-                SATP       : data_out_o = satp;
                 default    : e_illegal_inst_csr_o = 1;
             endcase
         end
-            if (we_exc_i) begin
-                mepc    = mepc_d_i;
-                mcause  = mcause_d_i;
-                mstatus = mstatus_d_i;
-                mtval   = mtval_d_i;
-            end
-
-            if (is_int_i) begin
-                mcause = mcause_d_i;
-                mip = mip_d_i;
-            end
+        if (we_exc_i) begin
+            mepc    = mepc_d_i;
+            mcause  = mcause_d_i;
+            //mstatus = mstatus_d_i;
+            mtval   = mtval_d_i;
+        end
+        if (e_illegal_inst_csr_o) begin
+            mepc    = mepc_d_i;
+            mcause  = 2;
+            //mstatus = mstatus_d_i;
+            mtval   = mtval_d_i;
+        end
+        if (is_int_i) begin
+            mcause = mcause_d_i;
+            mip = mip_d_i;
+        end
     end
 
     always @(posedge clk_i) begin
@@ -182,14 +176,8 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                     MINSTRET   : minstret     = is_csrrw ? data_i : (is_csrrs ? minstret   | data_i: minstret   & ~data_i);
                     MINSTRETH  : minstreth    = is_csrrw ? data_i : (is_csrrs ? minstreth  | data_i: minstreth  & ~data_i);
                     MCOUNTEREN : mcounteren   = is_csrrw ? data_i : (is_csrrs ? mcounteren | data_i: mcounteren & ~data_i);
-                    PMPCFG0    : pmpcfg0      = is_csrrw ? data_i : (is_csrrs ? pmpcfg0    | data_i: pmpcfg0    & ~data_i);
-                    PMPADDR0   : pmpaddr0     = is_csrrw ? data_i : (is_csrrs ? pmpaddr0   | data_i: pmpaddr0   & ~data_i);
-                    SATP       : satp         = is_csrrw ? data_i : (is_csrrs ? satp       | data_i: satp       & ~data_i);
                     default;
                 endcase
         end 
-    end
-            
-
-        
+    end        
 endmodule
