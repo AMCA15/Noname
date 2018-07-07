@@ -150,14 +150,16 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                 case (addr_i)
                     MISA       : misa         = is_csrrw ? data_i : (is_csrrs ? misa       | data_i: misa       & ~data_i);
                     MEDELEG    : medeleg      = is_csrrw ? data_i : (is_csrrs ? medeleg    | data_i: medeleg    & ~data_i);
+                    MIDELEG    : mideleg      = is_csrrw ? data_i : (is_csrrs ? mideleg    | data_i: mideleg    & ~data_i);
                 //  MVENDORID  : mvendorid    = is_csrrw ? data_i : (is_csrrs ? mvendorid  | data_i: mvendorid  & ~data_i);
                 //  MARCHID    : marchid      = is_csrrw ? data_i : (is_csrrs ? marchid    | data_i: marchid    & ~data_i);
                 //  MIMPID     : mimpid       = is_csrrw ? data_i : (is_csrrs ? mimpid     | data_i: mimpid     & ~data_i);
                 //  MHARTID    : mhartid      = is_csrrw ? data_i : (is_csrrs ? mhartid    | data_i: mhartid    & ~data_i);
                     MCAUSE     : mcause       = is_csrrw ? data_i : (is_csrrs ? mcause     | data_i: mcause     & ~data_i);
-                    MCAUSE     : mtval        = is_csrrw ? data_i : (is_csrrs ? mtval      | data_i: mtval      & ~data_i);
+                    MTVAL      : mtval        = is_csrrw ? data_i : (is_csrrs ? mtval      | data_i: mtval      & ~data_i);
                     MSTATUS    : mstatus      = is_csrrw ? data_i : (is_csrrs ? mstatus    | data_i: mstatus    & ~data_i);
                     MTVEC      : mtvec        = is_csrrw ? data_i : (is_csrrs ? mtvec      | data_i: mtvec      & ~data_i);
+                    MSCRATCH   : mscratch     = is_csrrw ? data_i : (is_csrrs ? mscratch   | data_i: mscratch   & ~data_i);
                     MEPC       : mepc         = is_csrrw ? data_i : (is_csrrs ? mepc       | data_i: mepc       & ~data_i);
                 //    MIP        : mip          = is_csrrw ? data_i : (is_csrrs ? mip        | data_i: mip        & ~data_i);
                     MIE        : mie          = is_csrrw ? data_i : (is_csrrs ? mie        | data_i: mie        & ~data_i);
@@ -166,6 +168,9 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                     MINSTRET   : minstret     = is_csrrw ? data_i : (is_csrrs ? minstret   | data_i: minstret   & ~data_i);
                     MINSTRETH  : minstreth    = is_csrrw ? data_i : (is_csrrs ? minstreth  | data_i: minstreth  & ~data_i);
                     MCOUNTEREN : mcounteren   = is_csrrw ? data_i : (is_csrrs ? mcounteren | data_i: mcounteren & ~data_i);
+                    PMPCFG0    : pmpcfg0      = is_csrrw ? data_i : (is_csrrs ? pmpcfg0    | data_i: pmpcfg0    & ~data_i);
+                    PMPADDR0   : pmpaddr0     = is_csrrw ? data_i : (is_csrrs ? pmpaddr0   | data_i: pmpaddr0   & ~data_i);
+                    SATP       : satp         = is_csrrw ? data_i : (is_csrrs ? satp       | data_i: satp       & ~data_i);
                     default;
                 endcase
             end
