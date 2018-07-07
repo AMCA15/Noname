@@ -4,29 +4,27 @@
 */
 
 module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mcause_d_i, mepc_d_i, mtval_d_i,
-            mstatus_d_i, sel_exc_nret_i, data_out_o, exc_ret_addr_o);
+           mstatus_d_i, mip_d_i, sel_exc_nret_i, is_int_i, e_illegal_inst_csr_o, data_out_o, mie_o, exc_ret_addr_o);
 
     // CSR Address
-    localparam MISA_ADDR       = 'h301;
-    localparam MEDELEG_ADDR    = 'h302;
-    localparam MVENDORID_ADDR  = 'hF11;
-    localparam MARCHID_ADDR    = 'hF12;
-    localparam MIMPID_ADDR     = 'hF13;
-    localparam MHARTID_ADDR    = 'hF14;
-    localparam MCAUSE_ADDR     = 'h342;
-    localparam MTVAL_ADDR      = 'h343;
-    localparam MSTATUS_ADDR    = 'h300;
-    localparam MTVEC_ADDR      = 'h305;
-    localparam MEPC_ADDR       = 'h341;
-    localparam MIP_ADDR        = 'h344;
-    localparam MIE_ADDR        = 'h304;
-    localparam MCYCLE_ADDR     = 'hB00;
-    localparam MYCLEH_ADDR     = 'hB80;
-    localparam MINSTRET_ADDR   = 'hB02;
-    localparam MINSTRETH_ADDR  = 'hB82;
-    localparam MCOUNTEREN_ADDR = 'h306;
-    localparam PMPCFG0_ADDR    = 'h3A0;
-    localparam PMPADDR0_ADDR   = 'h3B0;
+    localparam MISA       = 'h301;
+    localparam MEDELEG    = 'h302;
+    localparam MVENDORID  = 'hF11;
+    localparam MARCHID    = 'hF12;
+    localparam MIMPID     = 'hF13;
+    localparam MHARTID    = 'hF14;
+    localparam MCAUSE     = 'h342;
+    localparam MTVAL      = 'h343;
+    localparam MSTATUS    = 'h300;
+    localparam MTVEC      = 'h305;
+    localparam MEPC       = 'h341;
+    localparam MIP        = 'h344;
+    localparam MIE        = 'h304;
+    localparam MCYCLE     = 'hB00;
+    localparam MYCLEH     = 'hB80;
+    localparam MINSTRET   = 'hB02;
+    localparam MINSTRETH  = 'hB82;
+    localparam MCOUNTEREN = 'h306;
 
     // CSR Instruction
     localparam CSRRW = 2'b01;
@@ -45,10 +43,14 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     input [31:0] data_i;
     input [31:0] mcause_d_i;
     input [31:0] mepc_d_i;
-    input [31:0] mstatus_d_i;
     input [31:0] mtval_d_i;
+    input [31:0] mstatus_d_i;
+    input [31:0] mip_d_i;
     input sel_exc_nret_i;
-    output reg [31:0] data_out_o;
+    input is_int_i;
+    output e_illegal_inst_csr_o;
+    output [31:0] data_out_o;
+    output [31:0] mie_o;
     output [31:0] exc_ret_addr_o;
 
     reg [31:0] misa;
@@ -69,13 +71,10 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     reg [31:0] minstret;
     reg [31:0] minstreth;
     reg [31:0] mcounteren;
-    reg [31:0] pmpcfg0;
-    reg [31:0] pmpaddr0;
 
     wire is_csrrw = funct3_i[1:0] == CSRRW;
     wire is_csrrs = funct3_i[1:0] == CSRRS;
     wire is_csrrc = funct3_i[1:0] == CSRRC;
-
 
     assign exc_ret_addr_o = sel_exc_nret_i ? mepc : mtvec;
 
@@ -98,60 +97,56 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
             minstret    = 0;
             minstreth   = 0;
             mcounteren  = 0;
-            pmpcfg0     = 0;
-            pmpaddr0    = 0;
         end
 
         /* verilator lint_off CASEINCOMPLETE */
         // If it's a CSR instruction write the new data in the register
         else if (is_csr_i) begin
+            e_illegal_inst_csr_o = 0;
             // Read the old data before write
             case (addr_i)
-                MISA_ADDR       : data_out_o = misa;
-                MEDELEG_ADDR    : data_out_o = medeleg;
-                MVENDORID_ADDR  : data_out_o = mvendorid;
-                MARCHID_ADDR    : data_out_o = marchid;
-                MIMPID_ADDR     : data_out_o = mimpid;
-                MHARTID_ADDR    : data_out_o = mhartid;
-                MCAUSE_ADDR     : data_out_o = mcause;
-                MTVAL_ADDR      : data_out_o = mtval;
-                MSTATUS_ADDR    : data_out_o = mstatus;
-                MTVEC_ADDR      : data_out_o = mtvec;
-                MEPC_ADDR       : data_out_o = mepc;
-                MIP_ADDR        : data_out_o = mip;
-                MIE_ADDR        : data_out_o = mie;
-                MCYCLE_ADDR     : data_out_o = mcycle;
-                MYCLEH_ADDR     : data_out_o = mycleh;
-                MINSTRET_ADDR   : data_out_o = minstret;
-                MINSTRETH_ADDR  : data_out_o = minstreth;
-                MCOUNTEREN_ADDR : data_out_o = mcounteren;
-                PMPCFG0_ADDR    : data_out_o = pmpcfg0;
-                PMPADDR0_ADDR   : data_out_o = pmpaddr0;
+                MISA       : data_out_o = misa;
+                MEDELEG    : data_out_o = medeleg;
+                MVENDORID  : data_out_o = mvendorid;
+                MARCHID    : data_out_o = marchid;
+                MIMPID     : data_out_o = mimpid;
+                MHARTID    : data_out_o = mhartid;
+                MCAUSE     : data_out_o = mcause;
+                MTVAL      : data_out_o = mtval;
+                MSTATUS    : data_out_o = mstatus;
+                MTVEC      : data_out_o = mtvec;
+                MEPC       : data_out_o = mepc;
+                MIP        : data_out_o = mip;
+                MIE        : data_out_o = mie;
+                MCYCLE     : data_out_o = mcycle;
+                MYCLEH     : data_out_o = mycleh;
+                MINSTRET   : data_out_o = minstret;
+                MINSTRETH  : data_out_o = minstreth;
+                MCOUNTEREN : data_out_o = mcounteren;
+                default    : e_illegal_inst_csr_o = 1;
             endcase
 
             if ((!funct3_i[2] && |rs1_i) || (funct3_i[2] && |data_i)) begin
                 case (addr_i)
-                    MISA_ADDR       : misa         = is_csrrw ? data_i : (is_csrrs ? misa       | data_i: misa       & ~data_i);
-                    MEDELEG_ADDR    : medeleg      = is_csrrw ? data_i : (is_csrrs ? medeleg    | data_i: medeleg    & ~data_i);
-                //  MVENDORID_ADDR  : mvendorid    = is_csrrw ? data_i : (is_csrrs ? mvendorid  | data_i: mvendorid  & ~data_i);
-                //  MARCHID_ADDR    : marchid      = is_csrrw ? data_i : (is_csrrs ? marchid    | data_i: marchid    & ~data_i);
-                //  MIMPID_ADDR     : mimpid       = is_csrrw ? data_i : (is_csrrs ? mimpid     | data_i: mimpid     & ~data_i);
-                //  MHARTID_ADDR    : mhartid      = is_csrrw ? data_i : (is_csrrs ? mhartid    | data_i: mhartid    & ~data_i);
-                    MCAUSE_ADDR     : mcause       = is_csrrw ? data_i : (is_csrrs ? mcause     | data_i: mcause     & ~data_i);
-                    MCAUSE_ADDR     : mtval        = is_csrrw ? data_i : (is_csrrs ? mtval      | data_i: mtval      & ~data_i);
-                    MSTATUS_ADDR    : mstatus      = is_csrrw ? data_i : (is_csrrs ? mstatus    | data_i: mstatus    & ~data_i);
-                    MTVEC_ADDR      : mtvec        = is_csrrw ? data_i : (is_csrrs ? mtvec      | data_i: mtvec      & ~data_i);
-                    MEPC_ADDR       : mepc         = is_csrrw ? data_i : (is_csrrs ? mepc       | data_i: mepc       & ~data_i);
-                    MIP_ADDR        : mip          = is_csrrw ? data_i : (is_csrrs ? mip        | data_i: mip        & ~data_i);
-                    MIE_ADDR        : mie          = is_csrrw ? data_i : (is_csrrs ? mie        | data_i: mie        & ~data_i);
-                    MCYCLE_ADDR     : mcycle       = is_csrrw ? data_i : (is_csrrs ? mcycle     | data_i: mcycle     & ~data_i);
-                    MYCLEH_ADDR     : mycleh       = is_csrrw ? data_i : (is_csrrs ? mycleh     | data_i: mycleh     & ~data_i);
-                    MINSTRET_ADDR   : minstret     = is_csrrw ? data_i : (is_csrrs ? minstret   | data_i: minstret   & ~data_i);
-                    MINSTRETH_ADDR  : minstreth    = is_csrrw ? data_i : (is_csrrs ? minstreth  | data_i: minstreth  & ~data_i);
-                    MCOUNTEREN_ADDR : mcounteren   = is_csrrw ? data_i : (is_csrrs ? mcounteren | data_i: mcounteren & ~data_i);
-                    PMPCFG0_ADDR    : pmpcfg0      = is_csrrw ? data_i : (is_csrrs ? pmpcfg0    | data_i: pmpcfg0   & ~data_i);
-                    PMPADDR0_ADDR   : pmpaddr0     = is_csrrw ? data_i : (is_csrrs ? pmpaddr0   | data_i: pmpaddr0   & ~data_i);
-                    default;
+                    MISA       : misa         = is_csrrw ? data_i : (is_csrrs ? misa       | data_i: misa       & ~data_i);
+                    MEDELEG    : medeleg      = is_csrrw ? data_i : (is_csrrs ? medeleg    | data_i: medeleg    & ~data_i);
+                //  MVENDORID  : mvendorid    = is_csrrw ? data_i : (is_csrrs ? mvendorid  | data_i: mvendorid  & ~data_i);
+                //  MARCHID    : marchid      = is_csrrw ? data_i : (is_csrrs ? marchid    | data_i: marchid    & ~data_i);
+                //  MIMPID     : mimpid       = is_csrrw ? data_i : (is_csrrs ? mimpid     | data_i: mimpid     & ~data_i);
+                //  MHARTID    : mhartid      = is_csrrw ? data_i : (is_csrrs ? mhartid    | data_i: mhartid    & ~data_i);
+                    MCAUSE     : mcause       = is_csrrw ? data_i : (is_csrrs ? mcause     | data_i: mcause     & ~data_i);
+                    MCAUSE     : mtval        = is_csrrw ? data_i : (is_csrrs ? mtval      | data_i: mtval      & ~data_i);
+                    MSTATUS    : mstatus      = is_csrrw ? data_i : (is_csrrs ? mstatus    | data_i: mstatus    & ~data_i);
+                    MTVEC      : mtvec        = is_csrrw ? data_i : (is_csrrs ? mtvec      | data_i: mtvec      & ~data_i);
+                    MEPC       : mepc         = is_csrrw ? data_i : (is_csrrs ? mepc       | data_i: mepc       & ~data_i);
+                //    MIP        : mip          = is_csrrw ? data_i : (is_csrrs ? mip        | data_i: mip        & ~data_i);
+                    MIE        : mie          = is_csrrw ? data_i : (is_csrrs ? mie        | data_i: mie        & ~data_i);
+                    MCYCLE     : mcycle       = is_csrrw ? data_i : (is_csrrs ? mcycle     | data_i: mcycle     & ~data_i);
+                    MYCLEH     : mycleh       = is_csrrw ? data_i : (is_csrrs ? mycleh     | data_i: mycleh     & ~data_i);
+                    MINSTRET   : minstret     = is_csrrw ? data_i : (is_csrrs ? minstret   | data_i: minstret   & ~data_i);
+                    MINSTRETH  : minstreth    = is_csrrw ? data_i : (is_csrrs ? minstreth  | data_i: minstreth  & ~data_i);
+                    MCOUNTEREN : mcounteren   = is_csrrw ? data_i : (is_csrrs ? mcounteren | data_i: mcounteren & ~data_i);
+                    default    : e_illegal_inst_csr_o = 1;
                 endcase
             end
             /* verilator lint_on CASEINCOMPLETE */
@@ -163,5 +158,11 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
             mstatus = mstatus_d_i;
             mtval   = mtval_d_i;
         end
+
+        if (is_int_i) begin
+            mcause = mcause_d_i;
+            mip = mip_d_i;
+        end
+
     end
 endmodule

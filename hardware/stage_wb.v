@@ -49,11 +49,19 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     reg [31:0] mcause, mstatus, mtval, csr_out;
 
 
-    reg we_exc_csr =  is_exc_taken_o && !is_xret;
-    wire is_csr  =  is_system_i &&  |funct3_i;
-    wire e_ecall =  is_system_i && !|funct3_i && (instruction_i[31:20] == ECALL);
-    wire e_break =  is_system_i && !|funct3_i && (instruction_i[31:20] == EBREAK);
-    wire is_xret = (is_system_i && !|funct3_i && |{instruction_i[28:27], instruction_i[21]}) ? 1 : 0;
+    wire [31:0] mie;
+    wire [31:0] mip = {xint_meip_i, 3'b0, xint_mtip_i, 3'b0, xint_msip_i, 3'b0};
+    wire e_illegal_inst_csr;
+    wire we_exc_csr =   is_exc_taken_o && !is_xret;
+    wire is_csr     =   is_system_i &&  |funct3_i;
+    wire e_ecall    =   is_system_i && !|funct3_i && (instruction_i[31:20] == ECALL);
+    wire e_break    =   is_system_i && !|funct3_i && (instruction_i[31:20] == EBREAK);
+    wire is_xret    =  (is_system_i && !|funct3_i && |{instruction_i[28:27], instruction_i[21]}) ? 1 : 0;
+    wire is_int     = ((mie[11] && xint_meip_i) || (mie[7] && xint_mtip_i) || (mie[3] && xint_msip_i)) ? 1 : 0;
+
+    assign is_exc_taken_o = e_illegal_inst_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i | e_ecall | e_break | is_xret;
+    assign rd_o = instruction_i[11:7];
+
 
     csr wb_csr (.clk_i(clk_i),
                 .rst_i(rst_i),
@@ -67,25 +75,30 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
                 .mepc_d_i(pc_i),
                 .mtval_d_i(mtval),
                 .mstatus_d_i(mstatus),
+                .mip_d_i(mip),
                 .sel_exc_nret_i(is_xret),
+                .is_int_i(is_int),
+                .e_illegal_inst_csr_o(e_illegal_inst_csr),
                 .data_out_o(csr_out),
+                .mie_o(mie),
                 .exc_ret_addr_o(exc_ret_addr_o));
     
 
     // Exception encoder
     always @(*) begin
-        is_exc_taken_o = e_illegal_inst_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i | e_ecall | e_break | is_xret;
-
-        
         /* verilator lint_off CASEINCOMPLETE */
         case(1'b1)
-            e_illegal_inst_i: begin
-                mcause = 2;
-                mtval  = instruction_i;
-            end
             e_inst_addr_mis_i: begin
                 mcause = 0;
                 mtval  = pc_i;
+            end
+            e_illegal_inst_i | e_illegal_inst_csr: begin
+                mcause = 2;
+                mtval  = instruction_i;
+            end
+            e_break: begin
+                mcause = 3;
+                mtval  = 0;
             end
             e_ld_addr_mis_i: begin   
                 mcause = 4;
@@ -99,9 +112,14 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
                 mcause = 11;
                 mtval  = mem_addr_i;
             end
-            e_break: begin
-                mcause = 3;
-                mtval = 0;
+            xint_meip_i: begin
+                mcause = 0'h8000000B;
+            end
+            xint_mtip_i: begin
+                mcause = 0'h80000007;
+            end
+            xint_msip_i: begin
+                mcause = 0'h80000003;
             end
         endcase
         /* verilator lint_on CASEINCOMPLETE */
@@ -109,8 +127,9 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     
     // Write-Back Mux
     always @(*) begin
-        
-        rd_o = instruction_i[11:7];
+        // Check if we need/can write to the registers
+        we_rf_o = ((is_op_i || is_ld_mem_i || is_csr || is_lui_i || is_auipc_i || is_jal_i || is_jalr_i) && !is_exc_taken_o) ? 1 : 0;
+
         case (1'b1)
             is_ld_mem_i:                    rf_wd_o = mem_d_i;
             is_csr:                         rf_wd_o = csr_out;             
@@ -118,9 +137,6 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
             is_op_i|is_lui_i|is_auipc_i:    rf_wd_o = alu_d_i;
             default;
         endcase
-
-        // Check if we need/can write to the registers
-        we_rf_o = ((is_op_i || is_ld_mem_i || is_csr || is_lui_i || is_auipc_i || is_jal_i || is_jalr_i) && !is_exc_taken_o) ? 1 : 0;
     end
 
 endmodule
