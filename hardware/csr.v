@@ -9,6 +9,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     // CSR Address
     localparam MISA       = 'h301;
     localparam MEDELEG    = 'h302;
+    localparam MIDELEG    = 'h303;
     localparam MVENDORID  = 'hF11;
     localparam MARCHID    = 'hF12;
     localparam MIMPID     = 'hF13;
@@ -17,6 +18,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     localparam MTVAL      = 'h343;
     localparam MSTATUS    = 'h300;
     localparam MTVEC      = 'h305;
+    localparam MSCRATCH   = 'h340;
     localparam MEPC       = 'h341;
     localparam MIP        = 'h344;
     localparam MIE        = 'h304;
@@ -25,6 +27,9 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     localparam MINSTRET   = 'hB02;
     localparam MINSTRETH  = 'hB82;
     localparam MCOUNTEREN = 'h306;
+    localparam PMPCFG0    = 'h3A0;
+    localparam PMPADDR0   = 'h3B0;
+    localparam SATP       = 'h180;
 
     // CSR Instruction
     localparam CSRRW = 2'b01;
@@ -55,6 +60,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
 
     reg [31:0] misa;
     reg [31:0] medeleg;
+    reg [31:0] mideleg;
     reg [31:0] mvendorid;
     reg [31:0] marchid;
     reg [31:0] mimpid;
@@ -63,6 +69,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     reg [31:0] mtval;
     reg [31:0] mstatus;
     reg [31:0] mtvec;
+    reg [31:0] mscratch;
     reg [31:0] mepc;
     reg [31:0] mip;
     reg [31:0] mie;
@@ -71,6 +78,9 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     reg [31:0] minstret;
     reg [31:0] minstreth;
     reg [31:0] mcounteren;
+    reg [31:0] pmpcfg0;
+    reg [31:0] pmpaddr0;
+    reg [31:0] satp;
 
     wire is_csrrw = funct3_i[1:0] == CSRRW;
     wire is_csrrs = funct3_i[1:0] == CSRRS;
@@ -82,6 +92,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
         if (rst_i) begin
     	    misa        = 0;
     	    medeleg     = 0;
+    	    mideleg     = 0;
             mvendorid   = 0;
             marchid     = 0;
             mimpid      = 0;
@@ -89,6 +100,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
             mcause      = 0;
             mstatus     = 0;
             mtvec       = 0;
+            mscratch    = 0;
             mepc        = 0;
             mip         = 0;
             mie         = 0;
@@ -97,6 +109,9 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
             minstret    = 0;
             minstreth   = 0;
             mcounteren  = 0;
+            pmpcfg0     = 0;
+            pmpaddr0    = 0;
+            satp        = 0;
         end
 
         /* verilator lint_off CASEINCOMPLETE */
@@ -107,6 +122,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
             case (addr_i)
                 MISA       : data_out_o = misa;
                 MEDELEG    : data_out_o = medeleg;
+                MIDELEG    : data_out_o = mideleg;
                 MVENDORID  : data_out_o = mvendorid;
                 MARCHID    : data_out_o = marchid;
                 MIMPID     : data_out_o = mimpid;
@@ -115,6 +131,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                 MTVAL      : data_out_o = mtval;
                 MSTATUS    : data_out_o = mstatus;
                 MTVEC      : data_out_o = mtvec;
+                MSCRATCH   : data_out_o = mscratch;
                 MEPC       : data_out_o = mepc;
                 MIP        : data_out_o = mip;
                 MIE        : data_out_o = mie;
@@ -123,6 +140,9 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                 MINSTRET   : data_out_o = minstret;
                 MINSTRETH  : data_out_o = minstreth;
                 MCOUNTEREN : data_out_o = mcounteren;
+                PMPCFG0    : data_out_o = pmpcfg0;
+                PMPADDR0   : data_out_o = pmpaddr0;
+                SATP       : data_out_o = satp;
                 default    : e_illegal_inst_csr_o = 1;
             endcase
 
@@ -146,7 +166,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                     MINSTRET   : minstret     = is_csrrw ? data_i : (is_csrrs ? minstret   | data_i: minstret   & ~data_i);
                     MINSTRETH  : minstreth    = is_csrrw ? data_i : (is_csrrs ? minstreth  | data_i: minstreth  & ~data_i);
                     MCOUNTEREN : mcounteren   = is_csrrw ? data_i : (is_csrrs ? mcounteren | data_i: mcounteren & ~data_i);
-                    default    : e_illegal_inst_csr_o = 1;
+                    default;
                 endcase
             end
             /* verilator lint_on CASEINCOMPLETE */
