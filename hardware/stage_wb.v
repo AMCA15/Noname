@@ -52,14 +52,14 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     wire [31:0] mie;
     wire [31:0] mip = {xint_meip_i, 3'b0, xint_mtip_i, 3'b0, xint_msip_i, 3'b0};
     wire e_illegal_inst_csr;
-    wire we_exc_csr =   is_exc_taken_o && !is_xret;
+    wire we_exc_csr =   (e_illegal_inst_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i | e_ecall | e_break);
     wire is_csr     =   is_system_i &&  |funct3_i;
     wire e_ecall    =   is_system_i && !|funct3_i && (instruction_i[31:20] == ECALL);
     wire e_break    =   is_system_i && !|funct3_i && (instruction_i[31:20] == EBREAK);
     wire is_xret    =  (is_system_i && !|funct3_i && |{instruction_i[28:27], instruction_i[21]} && instruction_i[21]) ? 1 : 0;
     wire is_int     = ((mie[11] && xint_meip_i) || (mie[7] && xint_mtip_i) || (mie[3] && xint_msip_i)) ? 1 : 0;
 
-    assign is_exc_taken_o = e_illegal_inst_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i | e_ecall | e_break | is_xret | e_illegal_inst_csr;
+    assign is_exc_taken_o = we_exc_csr | e_illegal_inst_csr | is_xret;
     assign rd_o = instruction_i[11:7];
 
 
@@ -92,7 +92,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
                 mcause = 0;
                 mtval  = pc_i;
             end
-            e_illegal_inst_i | e_illegal_inst_csr: begin
+            e_illegal_inst_i: begin
                 mcause = 2;
                 mtval  = instruction_i;
             end
