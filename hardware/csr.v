@@ -109,9 +109,6 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
             minstret    = 0;
             minstreth   = 0;
             mcounteren  = 0;
-            pmpcfg0     = 0;
-            pmpaddr0    = 0;
-            satp        = 0;
         end
 
         /* verilator lint_off CASEINCOMPLETE */
@@ -140,9 +137,6 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                 MINSTRET   : data_out_o = minstret;
                 MINSTRETH  : data_out_o = minstreth;
                 MCOUNTEREN : data_out_o = mcounteren;
-                PMPCFG0    : data_out_o = pmpcfg0;
-                PMPADDR0   : data_out_o = pmpaddr0;
-                SATP       : data_out_o = satp;
                 default    : e_illegal_inst_csr_o = 1;
             endcase
         end
@@ -182,10 +176,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                     MINSTRET   : minstret     = is_csrrw ? data_i : (is_csrrs ? minstret   | data_i: minstret   & ~data_i);
                     MINSTRETH  : minstreth    = is_csrrw ? data_i : (is_csrrs ? minstreth  | data_i: minstreth  & ~data_i);
                     MCOUNTEREN : mcounteren   = is_csrrw ? data_i : (is_csrrs ? mcounteren | data_i: mcounteren & ~data_i);
-                    PMPCFG0    : pmpcfg0      = is_csrrw ? data_i : (is_csrrs ? pmpcfg0    | data_i: pmpcfg0    & ~data_i);
-                    PMPADDR0   : pmpaddr0     = is_csrrw ? data_i : (is_csrrs ? pmpaddr0   | data_i: pmpaddr0   & ~data_i);
-                    SATP       : satp         = is_csrrw ? data_i : (is_csrrs ? satp       | data_i: satp       & ~data_i);
-                    default;
+                    default: e_illegal_inst_csr_o = 1;
                 endcase
         end 
     end
