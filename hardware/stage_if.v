@@ -71,12 +71,12 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exc_ret_addr_i, sel_addr_i, stall_i,
       case (sel_addr_i)
         SECUENTIAL_ADDR: if (!stall_i && !wbm_cyc_o) pc_o <= pc_o + 4;
         BRANCH_ADDR:     pc_o <= (!stall_i && !wbm_cyc_o) ? br_j_addr_i : br_j_addr_i - 4;
-        EXCEPTION_ADDR:  pc_o <= (!stall_i && !wbm_cyc_o) ? exc_ret_addr_i : exc_ret_addr_i;
-        default:         pc_o <= (!stall_i && !wbm_cyc_o) ? exc_ret_addr_i : exc_ret_addr_i;
+        EXCEPTION_ADDR:  pc_o <= (!stall_i && !wbm_cyc_o) ? exc_ret_addr_i : exc_ret_addr_i - 4;
+        default:         pc_o <= (!stall_i && !wbm_cyc_o) ? exc_ret_addr_i : exc_ret_addr_i - 4;
       endcase
     /* verilator lint_on CASEINCOMPLETE */
 
-    if(wbm_ack_i && (sel_addr_i == BRANCH_ADDR)) b_asynch_o <= 1; 
+    if(wbm_ack_i && (sel_addr_i != 2'b00)) b_asynch_o <= 1; 
     
     instruction_o <= wbm_ack_i ? wbm_dat_i  : instruction_o;
     

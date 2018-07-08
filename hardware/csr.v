@@ -86,7 +86,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
         e_illegal_inst_csr_o = 0;
         
         if (rst_i) begin
-    	    misa        = 0;
+    	    misa        = 'h40000000;
     	    medeleg     = 0;
     	    mideleg     = 0;
             mvendorid   = 0;
@@ -166,7 +166,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                     MCAUSE     : mcause       = is_csrrw ? data_i : (is_csrrs ? mcause     | data_i: mcause     & ~data_i);
                     MTVAL      : mtval        = is_csrrw ? data_i : (is_csrrs ? mtval      | data_i: mtval      & ~data_i);
                     MSTATUS    : mstatus      = is_csrrw ? data_i : (is_csrrs ? mstatus    | data_i: mstatus    & ~data_i);
-                    MTVEC      : mtvec        = is_csrrw ? (data_i & 0'hFFFFFFFC) : (is_csrrs ? (mtvec | data_i) & 0'hFFFFFFFC: (mtvec & ~data_i)) & (data_i & 0'hFFFFFFFC);
+                    MTVEC      : mtvec        = is_csrrw ? data_i : (is_csrrs ? mtvec      | data_i: mtvec      & ~data_i);
                     MSCRATCH   : mscratch     = is_csrrw ? data_i : (is_csrrs ? mscratch   | data_i: mscratch   & ~data_i);
                     MEPC       : mepc         = is_csrrw ? data_i : (is_csrrs ? mepc       | data_i: mepc       & ~data_i);
                 //    MIP        : mip          = is_csrrw ? data_i : (is_csrrs ? mip        | data_i: mip        & ~data_i);
