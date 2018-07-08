@@ -90,7 +90,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
         case(1'b1)
             e_inst_addr_mis_i: begin
                 mcause = 0;
-                mtval  = pc_i;
+                mtval  = mem_addr_i;
             end
             e_illegal_inst_i: begin
                 mcause = 2;
