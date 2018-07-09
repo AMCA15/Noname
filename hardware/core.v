@@ -95,20 +95,21 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	// 						      EXE/MEM
 	wire exe_mem_stall = mem_wb_stall || ((exe_mem_o[`R_IS_LD_MEM] || exe_mem_o[`R_IS_ST_MEM]) && !(mem_wb_e_ld_addr_mis_i || mem_wb_e_st_addr_mis_i)) && !(dwbm_ack_i || dwbm_err_i);
 	wire exe_mem_flush = is_exc_taken;
-	wire [301:0] exe_mem_i = {exe_mem_e_inst_addr_mis_o, exe_mem_alu_out_i, id_exe_o};
-	reg  [301:0] exe_mem_o;
+	wire [333:0] exe_mem_i = {exe_mem_e_inst_addr_mis_i, exe_mem_alu_out_i, exe_mem_br_j_addr_i, id_exe_o};
+	reg  [333:0] exe_mem_o;
 
 	// Signals
-	wire exe_mem_e_inst_addr_mis_o;
+	wire exe_mem_e_inst_addr_mis_i;
 	wire [31:0] exe_mem_alu_out_i;
+	wire [31:0] exe_mem_br_j_addr_i;
 
 
 	//---------------------------------------------------------------
 	// 						      MEM/WB
 	wire mem_wb_stall;
 	wire mem_wb_flush = is_exc_taken || exe_mem_stall;
-	wire [335:0] mem_wb_i = {mem_wb_mem_data_i, mem_wb_e_ld_addr_mis_i, mem_wb_e_st_addr_mis_i, exe_mem_o};
-	reg  [335:0] mem_wb_o;
+	wire [367:0] mem_wb_i = {mem_wb_mem_data_i, mem_wb_e_ld_addr_mis_i, mem_wb_e_st_addr_mis_i, exe_mem_o};
+	reg  [367:0] mem_wb_o;
 
 	// Signals
 	wire [31:0] mem_wb_mem_data_i;
@@ -133,7 +134,6 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 
 	//---------------------------------------------------------------
 	// 						    Stage-IF
-	wire [31:0] br_j_addr;
 	wire [31:0] exc_ret_addr;
 
 	//---------------------------------------------------------------
@@ -192,7 +192,7 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 	stage_if #(.RESET_ADDR(RESET_ADDR[31:0]))
 		     core_stage_if(.clk_i(clk_i),
 						   .rst_i(rst_i),
-						   .br_j_addr_i(br_j_addr),
+						   .br_j_addr_i(exe_mem_br_j_addr_i),
 						   .exc_ret_addr_i(exc_ret_addr),
 						   .sel_addr_i({is_exc_taken, is_br_j_taken}),
 						   .stall_i(if_id_stall),
@@ -257,8 +257,8 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 							 .is_jalr_inst_i(id_exe_o[`R_IS_JALR]),
 							 .is_br_inst_i(id_exe_o[`R_IS_BRANCH]),
 							 .is_br_j_taken_o(is_br_j_taken),
-							 .e_inst_addr_mis_o(exe_mem_e_inst_addr_mis_o),
-							 .br_j_addr_o(br_j_addr),
+							 .e_inst_addr_mis_o(exe_mem_e_inst_addr_mis_i),
+							 .br_j_addr_o(exe_mem_br_j_addr_i),
 							 .alu_out_o(exe_mem_alu_out_i));
 
 	//---------------------------------------------------------------
@@ -296,9 +296,9 @@ module core (clk_i, rst_i, iwbm_ack_i, iwbm_err_i, iwbm_dat_i, iwbm_cyc_o, iwbm_
 						   .funct3_i(mem_wb_o[`R_FUNCT3]),
 						   .alu_d_i(mem_wb_o[`R_ALU_OUT]),
 						   .mem_d_i(mem_wb_o[`R_MEM_DATA_O]),
-						   .mem_addr_i(mem_wb_o[`R_ALU_OUT]),
 						   .csr_addr_i(mem_wb_o[`R_CSR_ADDR]),
 						   .csr_data_i(mem_wb_o[`R_ALU_OUT]),
+						   .br_j_addr_i(mem_wb_o[`R_BR_J_ADDR]),
 						   .is_op_i(mem_wb_o[`R_IS_OP]),
 						   .is_lui_i(mem_wb_o[`R_IS_LUI]),
 						   .is_auipc_i(mem_wb_o[`R_IS_AUIPC]),

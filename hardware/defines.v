@@ -7,14 +7,15 @@
 
 //----------------------   MEM/WB  ------------------------------
 
-`define R_MEM_DATA_O      335:304
-`define R_E_LD_ADDR_MIS   303
-`define R_E_ST_ADDR_MIS   302
+`define R_MEM_DATA_O      367:336
+`define R_E_LD_ADDR_MIS   335
+`define R_E_ST_ADDR_MIS   334
 
 //----------------------   EXE/MEM  -----------------------------
 
-`define R_E_INST_ADDR_MIS 301
-`define R_ALU_OUT         300:269
+`define R_E_INST_ADDR_MIS 333
+`define R_ALU_OUT         332:301
+`define R_BR_J_ADDR       300:269
 
 
 //----------------------   ID/EXE  ------------------------------

@@ -3,7 +3,7 @@
 * Anderson Contreras
 */
 
-module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, mem_d_i, mem_addr_i, csr_addr_i, csr_data_i,
+module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, mem_d_i, csr_addr_i, csr_data_i, br_j_addr_i,
                  is_op_i, is_lui_i, is_auipc_i, is_ld_mem_i, is_system_i, is_jal_i, is_jalr_i,
                  xint_meip_i, xint_mtip_i, xint_msip_i, e_illegal_inst_i, e_inst_addr_mis_i, e_ld_addr_mis_i, e_st_addr_mis_i,
                  rd_o, rf_wd_o, we_rf_o, exc_ret_addr_o, is_exc_taken_o);
@@ -20,9 +20,9 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     input [4:0] rs1_i;
     input [31:0] alu_d_i;
     input [31:0] mem_d_i;
-    input [31:0] mem_addr_i;
     input [11:0] csr_addr_i;
     input [31:0] csr_data_i;
+    input [31:0] br_j_addr_i;
 
     input is_op_i;
     input is_lui_i;
@@ -90,7 +90,7 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
         case(1'b1)
             e_inst_addr_mis_i: begin
                 mcause = 0;
-                mtval  = mem_addr_i;
+                mtval  = br_j_addr_i;
             end
             e_illegal_inst_i: begin
                 mcause = 2;
@@ -102,15 +102,15 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
             end
             e_ld_addr_mis_i: begin   
                 mcause = 4;
-                mtval  = mem_addr_i;
+                mtval  = alu_d_i;
             end
             e_st_addr_mis_i: begin
                 mcause = 6;
-                mtval  = mem_addr_i;
+                mtval  = alu_d_i;
             end
             e_ecall: begin
                 mcause = 11;
-                mtval  = mem_addr_i;
+                mtval  = alu_d_i;
             end
             xint_meip_i: begin
                 mcause = 0'h8000000B;
@@ -131,11 +131,10 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
         we_rf_o = ((is_op_i || is_ld_mem_i || is_csr || is_lui_i || is_auipc_i || is_jal_i || is_jalr_i) && !is_exc_taken_o) ? 1 : 0;
 
         case (1'b1)
-            is_ld_mem_i:                    rf_wd_o = mem_d_i;
-            is_csr:                         rf_wd_o = csr_out;             
-            is_jal_i|is_jalr_i:             rf_wd_o = pc_i + 4;
-            is_op_i|is_lui_i|is_auipc_i:    rf_wd_o = alu_d_i;
-            default;
+            is_ld_mem_i:        rf_wd_o = mem_d_i;
+            is_csr:             rf_wd_o = csr_out;             
+            is_jal_i|is_jalr_i: rf_wd_o = pc_i + 4;
+            default:            rf_wd_o = alu_d_i;
         endcase
     end
 
