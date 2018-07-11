@@ -81,6 +81,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
     wire is_csrrc = funct3_i[1:0] == CSRRC;
 
     assign exc_ret_addr_o = sel_exc_nret_i ? mepc : mtvec;
+    assign mie_o = mie;
 
     always @(*) begin
         e_illegal_inst_csr_o = 0;
@@ -168,7 +169,7 @@ module csr(clk_i, rst_i, funct3_i, addr_i, data_i, is_csr_i, rs1_i, we_exc_i, mc
                 //  MSTATUS    : mstatus      = is_csrrw ? data_i : (is_csrrs ? mstatus    | data_i: mstatus    & ~data_i);
                     MTVEC      : mtvec        = is_csrrw ? data_i : (is_csrrs ? mtvec      | data_i: mtvec      & ~data_i);
                     MSCRATCH   : mscratch     = is_csrrw ? data_i : (is_csrrs ? mscratch   | data_i: mscratch   & ~data_i);
-                    MEPC       : mepc         = (is_csrrw && (data_i[1:0]==2'b00)) ? data_i : ((is_csrrs && (data_i[1:0]==2'b00)) ? mepc | data_i: (is_csrrc ? mepc & ~data_i : mepc));
+                    MEPC       : mepc         = |data_i[1:0] ? mepc : (is_csrrw ? data_i : ((is_csrrs ? mepc | data_i: mepc & ~data_i)));
                 //    MIP        : mip          = is_csrrw ? data_i : (is_csrrs ? mip        | data_i: mip        & ~data_i);
                     MIE        : mie          = is_csrrw ? data_i : (is_csrrs ? mie        | data_i: mie        & ~data_i);
                     MCYCLE     : mcycle       = is_csrrw ? data_i : (is_csrrs ? mcycle     | data_i: mcycle     & ~data_i);

@@ -4,7 +4,7 @@
 */
 
 module stage_id(clk_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, is_fwd_b_i, dat_fwd_a_i, dat_fwd_b_i,
-                funct3_o, rs1_o, rs2_o, rd_o, rs1_dat_o, rs2_dat_o, alu_op_o, csr_addr_o, dat_a_o, dat_b_o, imm_out_o, is_op_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
+                funct3_o, rs1_o, rs2_o, rd_o, rs2_dat_o, alu_op_o, csr_addr_o, dat_a_o, dat_b_o, imm_out_o, is_op_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
                 is_ld_mem_o, is_st_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);
     
     // Mux control for ALU's inputs
@@ -28,7 +28,6 @@ module stage_id(clk_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, 
     output [4:0]  rs1_o;
     output [4:0]  rs2_o;
     output [4:0]  rd_o;
-    output [31:0] rs1_dat_o;
     output [31:0] rs2_dat_o;
     output [3:0]  alu_op_o;
     output [11:0] csr_addr_o;
@@ -58,7 +57,6 @@ module stage_id(clk_i, instruction_i, pc_i, rd_i, rf_wd_i, rf_we_i, is_fwd_a_i, 
     wire [31:0] rs1_dat;
     wire [31:0] rs2_dat;
 
-    assign rs1_dat_o = is_fwd_a_i ? dat_fwd_a_i : rs1_dat;
     assign rs2_dat_o = is_fwd_b_i ? dat_fwd_b_i : rs2_dat;
     assign imm_out_o = imm_out;
     assign shamt     = rs2_dat_o & 32'h1F;

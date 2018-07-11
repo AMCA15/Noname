@@ -6,7 +6,7 @@
 module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, mem_d_i, csr_addr_i, csr_data_i, br_j_addr_i,
                  is_op_i, is_lui_i, is_auipc_i, is_ld_mem_i, is_system_i, is_jal_i, is_jalr_i,
                  xint_meip_i, xint_mtip_i, xint_msip_i, e_illegal_inst_i, e_inst_addr_mis_i, e_ld_addr_mis_i, e_st_addr_mis_i,
-                 rd_o, rf_wd_o, we_rf_o, exc_ret_addr_o, is_exc_taken_o);
+                 rf_wd_o, we_rf_o, exc_ret_addr_o, is_exc_taken_o);
 
     localparam ECALL    = 12'b000000000000;
     localparam EBREAK   = 12'b000000000001;
@@ -40,7 +40,6 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     input e_ld_addr_mis_i;
     input e_st_addr_mis_i;
 
-    output [4:0] rd_o;
     output [31:0] rf_wd_o;
     output we_rf_o;
     output [31:0] exc_ret_addr_o;
@@ -50,17 +49,16 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
 
 
     wire [31:0] mie;
-    wire [31:0] mip = {xint_meip_i, 3'b0, xint_mtip_i, 3'b0, xint_msip_i, 3'b0};
+    wire [31:0] mip = {9'b0, xint_meip_i, 3'b0, xint_mtip_i, 3'b0, xint_msip_i, 3'b0};
     wire e_illegal_inst_csr;
     wire we_exc_csr =   (e_illegal_inst_i | e_inst_addr_mis_i | e_ld_addr_mis_i | e_st_addr_mis_i | e_ecall | e_break);
     wire is_csr     =   is_system_i &&  |funct3_i;
     wire e_ecall    =   is_system_i && !|funct3_i && (instruction_i[31:20] == ECALL);
     wire e_break    =   is_system_i && !|funct3_i && (instruction_i[31:20] == EBREAK);
     wire is_xret    =  (is_system_i && !|funct3_i && |{instruction_i[28:27], instruction_i[21]} && instruction_i[21]) ? 1 : 0;
-    wire is_int     = ((mie[11] && xint_meip_i) || (mie[7] && xint_mtip_i) || (mie[3] && xint_msip_i)) ? 1 : 0;
+    wire is_int     = ((mie[11] & xint_meip_i) | (mie[7] & xint_mtip_i) | (mie[3] & xint_msip_i)) ? 1 : 0;
 
-    assign is_exc_taken_o = we_exc_csr | e_illegal_inst_csr | is_xret;
-    assign rd_o = instruction_i[11:7];
+    assign is_exc_taken_o = we_exc_csr | e_illegal_inst_csr | is_xret | is_int;
 
 
     csr wb_csr (.clk_i(clk_i),
@@ -88,6 +86,17 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
     always @(*) begin
         /* verilator lint_off CASEINCOMPLETE */
         case(1'b1)
+            // Interrrupts
+            xint_meip_i & mie[11]: begin
+                mcause = 32'h8000000B;
+            end
+            xint_mtip_i & mie[7]: begin
+                mcause = 32'h80000007;
+            end
+            xint_msip_i & mie[3]: begin
+                mcause = 32'h80000003;
+            end
+            // Exceptions
             e_inst_addr_mis_i: begin
                 mcause = 0;
                 mtval  = br_j_addr_i;
@@ -111,15 +120,6 @@ module stage_wb (clk_i, rst_i, pc_i, instruction_i, rs1_i, funct3_i, alu_d_i, me
             e_ecall: begin
                 mcause = 11;
                 mtval  = alu_d_i;
-            end
-            xint_meip_i: begin
-                mcause = 0'h8000000B;
-            end
-            xint_mtip_i: begin
-                mcause = 0'h80000007;
-            end
-            xint_msip_i: begin
-                mcause = 0'h80000003;
             end
         endcase
         /* verilator lint_on CASEINCOMPLETE */
