@@ -3,15 +3,10 @@
 * Anderson Contreras
 */
 
-//Currently the clk_i and rst_i are only for simulation purposes
-
-module decoder(clk_i, rst_i, instruction_i,
+module decoder(instruction_i,
                funct3_o, rs1_o, rs2_o, rd_o, imm_op_o, sel_dat_a_o, sel_dat_b_o,
                alu_op_o, csr_addr_o, is_op_o, is_lui_o, is_auipc_o, is_jal_o, is_jalr_o, is_branch_o,
                is_ld_mem_o, is_st_mem_o, is_misc_mem_o, is_system_o, e_illegal_inst_o);
-
-  input clk_i;
-  input rst_i;
 
   // OPCODES
   localparam LUI      = 7'b0110111;
@@ -60,8 +55,8 @@ module decoder(clk_i, rst_i, instruction_i,
   output [4:0] rs1_o;
   output [4:0] rs2_o;
   output [4:0] rd_o;
-  output [2:0] sel_dat_a_o;
-  output [2:0] sel_dat_b_o;
+  output [1:0] sel_dat_a_o;
+  output [1:0] sel_dat_b_o;
   output [3:0] alu_op_o;
   output [11:0] csr_addr_o;
 
@@ -82,8 +77,8 @@ module decoder(clk_i, rst_i, instruction_i,
   assign opcode          = instruction_i[6:0];
   assign funct3_o        = instruction_i[14:12];
   assign rs1_o           = instruction_i[19:15];
-  assign rs2_o           = instruction_i[24:20];
-  assign rd_o            = instruction_i[11:7];
+  assign rs2_o           = (is_op_o || is_branch_o || is_st_mem_o)? instruction_i[24:20] : 0;
+  assign rd_o            = (is_branch_o || is_st_mem_o)? 0 : instruction_i[11:7];
   assign csr_addr_o      = instruction_i[31:20];
 
 
@@ -167,6 +162,7 @@ module decoder(clk_i, rst_i, instruction_i,
         imm_op_o    = IMM_SH;
         sel_dat_a_o = SEL_REG;
         sel_dat_b_o = SEL_IMM;
+        e_illegal_inst_o = ((funct3_o == 0'b001) || (funct3_o == 0'b101)) && instruction_i[25] ? 1: 0;
         case (funct3_o)
           3'b001: alu_op_o = {instruction_i[30], funct3_o};
           3'b101: alu_op_o = {instruction_i[30], funct3_o};

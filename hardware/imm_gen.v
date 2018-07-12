@@ -4,9 +4,8 @@
 * Anderson Contreras
 */
 
-//Currently the clk_i and rst_i are only for simulation purposes
 
-module imm_gen(clk_i, rst_i, instruction_i, imm_op_i, imm_o);
+module imm_gen(instruction_i, imm_op_i, imm_o);
   localparam IMM_I = 0'b000;
   localparam IMM_S = 0'b001;
   localparam IMM_B = 0'b010;
@@ -14,9 +13,6 @@ module imm_gen(clk_i, rst_i, instruction_i, imm_op_i, imm_o);
   localparam IMM_J = 0'b100;
   localparam IMM_C = 0'b101;
   localparam IMM_SH = 0'b110; //Shamt for shift
-
-  input clk_i;
-  input rst_i;
 
   input  [2:0] imm_op_i;
   input  [31:0] instruction_i;
@@ -29,8 +25,9 @@ module imm_gen(clk_i, rst_i, instruction_i, imm_op_i, imm_o);
   wire [31:0] imm_u;
   wire [31:0] imm_j;
   wire [31:0] imm_c;
-  wire [4:0]  imm_sh;
+  wire [31:0] imm_sh;
 
+	/* verilator lint_off WIDTH */
   assign imm_i = $signed(instruction_i[31:20]);
   assign imm_s = $signed({instruction_i[31:25], instruction_i[11:7]});
   assign imm_b = $signed({instruction_i[31], instruction_i[7], instruction_i[30:25], instruction_i[11:8], 1'b0});
@@ -41,13 +38,14 @@ module imm_gen(clk_i, rst_i, instruction_i, imm_op_i, imm_o);
 
   always @(*) begin
     case (imm_op_i)
-      IMM_I: imm_o = imm_i; 
-      IMM_S: imm_o = imm_s; 
-      IMM_B: imm_o = imm_b; 
-      IMM_U: imm_o = imm_u; 
-      IMM_J: imm_o = imm_j; 
-      IMM_C: imm_o = imm_c; 
+      IMM_I:  imm_o = imm_i; 
+      IMM_S:  imm_o = imm_s; 
+      IMM_B:  imm_o = imm_b; 
+      IMM_U:  imm_o = imm_u; 
+      IMM_J:  imm_o = imm_j; 
+      IMM_C:  imm_o = imm_c; 
       IMM_SH: imm_o = imm_sh;
     endcase    
+	/* verilator lint_on WIDTH */
   end
 endmodule

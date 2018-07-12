@@ -3,8 +3,8 @@
 * Anderson Contreras
 */
 
-module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i,
-                instruction_o, pc_o, wbm_dat_i, wbm_ack_i, wbm_err_i,
+module stage_if(clk_i, rst_i, br_j_addr_i, exc_ret_addr_i, sel_addr_i, stall_i,
+                instruction_o, pc_o, b_asynch_o, wbm_dat_i, wbm_ack_i, wbm_err_i,
                 wbm_cyc_o, wbm_stb_o, wbm_dat_o, wbm_addr_o, wbm_we_o, wbm_sel_o);
   
   parameter [31:0] RESET_ADDR       = 32'h0;
@@ -17,7 +17,7 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i
   input rst_i;
 
   input [31:0] br_j_addr_i;
-  input [31:0] exception_addr_i;
+  input [31:0] exc_ret_addr_i;
   input [1:0] sel_addr_i;
   input stall_i;
   output reg [31:0] instruction_o;
@@ -36,6 +36,7 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i
 /*----------------------------*/
   wire wbm_re;
   wire [3:0] wbm_sel;
+  output reg b_asynch_o;
 
 
   // Assigns
@@ -61,20 +62,26 @@ module stage_if(clk_i, rst_i, br_j_addr_i, exception_addr_i, sel_addr_i, stall_i
   // PC's
   always @(posedge clk_i) begin
     if (rst_i) begin
-      pc_o          = RESET_ADDR - 4;
-      instruction_o = `NOP;
+      pc_o          <= RESET_ADDR - 4;
+      instruction_o <= `NOP;
     end
-    else if (!stall_i && !wbm_cyc_o) begin
+    else begin
+      b_asynch_o <= 0;
+    /* verilator lint_off CASEINCOMPLETE */
       case (sel_addr_i)
-        SECUENTIAL_ADDR: pc_o = pc_o + 4;
-        BRANCH_ADDR:     pc_o = br_j_addr_i;
-        EXCEPTION_ADDR:  pc_o = exception_addr_i;
+        SECUENTIAL_ADDR: if (!stall_i && !wbm_cyc_o) pc_o <= pc_o + 4;
+        BRANCH_ADDR:     pc_o <= (!stall_i && !wbm_cyc_o) ? br_j_addr_i : br_j_addr_i - 4;
+        EXCEPTION_ADDR:  pc_o <= (!stall_i && !wbm_cyc_o) ? exc_ret_addr_i : exc_ret_addr_i - 4;
+        default:         pc_o <= (!stall_i && !wbm_cyc_o) ? exc_ret_addr_i : exc_ret_addr_i - 4;
       endcase
+    /* verilator lint_on CASEINCOMPLETE */
+
+    if(wbm_ack_i && (sel_addr_i != 2'b00)) b_asynch_o <= 1; 
+    
+    instruction_o <= wbm_ack_i ? wbm_dat_i  : instruction_o;
+    
     end
   end
 
-  always @(posedge wbm_ack_i) begin
-    instruction_o = wbm_ack_i ? wbm_dat_i : instruction_o;
-  end
 
 endmodule

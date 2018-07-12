@@ -46,7 +46,7 @@ build-model: verilate
 # ------------------------------------------------------------------------------
 # verilator tests
 run-tests: compile-tests build-model
-	$(eval .RVTESTS:=$(shell find $(.RVTESTSF) -name "rv32ui*.elf" -o -name "rv32um*.elf" -o -name "rv32mi*.elf" ! -name "*breakpoint*.elf"))
+	$(eval .RVTESTS:=$(shell find $(.RVTESTSF) -name "rv32ui*.elf" -o -name "rv32mi*.elf" ! -name "*breakpoint*.elf"))
 	$(eval .RVBENCHMARKS:=$(shell find $(.RVBENCHMARKSF) -name "*.riscv"))
 	$(eval .RVXTRAS:=$(shell find $(.RVXTRASF) -name "*.riscv"))
 
